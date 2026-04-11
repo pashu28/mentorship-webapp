@@ -32,7 +32,12 @@ jobs:
         run: |
           npm ci
           npm run build
+          if grep -q 'src/main.tsx' out/index.html; then
+            echo "Build did not transform index.html (dev entry still present). Check the build log."
+            exit 1
+          fi
           cp out/index.html out/404.html
+          touch out/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out
