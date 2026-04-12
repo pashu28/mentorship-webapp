@@ -33,9 +33,9 @@ export default function ProfileSummaryPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-zinc-950 flex flex-col">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 bg-white border-b border-gray-100">
+      <nav className="flex items-center justify-between px-8 py-5 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800">
         <div className="flex items-center gap-2.5">
           <img src="https://public.readdy.ai/ai/img_res/c1296ba1-3a0e-4b18-b1f8-e3ff105a92d8.png" alt="MentorAI" className="w-8 h-8 object-contain" />
           <span className="font-bold text-gray-900 text-lg">MentorAI</span>
@@ -62,7 +62,7 @@ export default function ProfileSummaryPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Left: Facts */}
           <div className={`lg:col-span-2 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 sticky top-6">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800 sticky top-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-medium mb-6">
                 <i className="ri-file-text-line" />
                 Parsed from your resume
@@ -145,7 +145,7 @@ export default function ProfileSummaryPage() {
           {/* Right: AI Magic */}
           <div className={`lg:col-span-3 flex flex-col gap-5 transition-all duration-700 delay-200 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
             {/* Strengths */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 border-l-4 border-l-emerald-400">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800 border-l-4 border-l-emerald-400">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 flex items-center justify-center rounded-full bg-emerald-100">
                   <i className="ri-lightbulb-flash-line text-emerald-600 text-base" />
@@ -166,7 +166,7 @@ export default function ProfileSummaryPage() {
             </div>
 
             {/* Gaps */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 border-l-4 border-l-amber-400">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800 border-l-4 border-l-amber-400">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 flex items-center justify-center rounded-full bg-amber-100">
                   <i className="ri-focus-3-line text-amber-600 text-base" />
@@ -193,7 +193,7 @@ export default function ProfileSummaryPage() {
             </div>
 
             {/* Proposed Focus */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 border-l-4 border-l-violet-400">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800 border-l-4 border-l-violet-400">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 flex items-center justify-center rounded-full bg-violet-100">
                   <i className="ri-compass-3-line text-violet-600 text-base" />

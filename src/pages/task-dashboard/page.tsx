@@ -232,7 +232,7 @@ export default function TaskDashboardPage() {
         />
       )}
 
-      <div className="w-full min-h-screen bg-[#F7F8FA]">
+      <div className="w-full min-h-screen bg-[#F7F8FA] dark:bg-zinc-950">
         {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="bg-[#F7F8FA] px-6 pt-8 pb-6">
           <div className="max-w-7xl mx-auto">
@@ -264,7 +264,7 @@ export default function TaskDashboardPage() {
                 const col = stepGroups[i].color;
                 const style = STEP_STYLE[col];
                 return (
-                  <div key={ring.id} className="flex items-center gap-4 bg-white rounded-2xl p-4 border border-gray-100">
+                  <div key={ring.id} className="flex items-center gap-4 bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-gray-100 dark:border-zinc-800">
                     <GoalRing label="" percentage={pct} color={ring.color} bgColor={ring.bg} size={68} />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-gray-400 font-medium mb-0.5">{stepGroups[i].label}</p>
@@ -284,7 +284,7 @@ export default function TaskDashboardPage() {
             {/* Stats Row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {/* Overall Progress */}
-              <div className="bg-white rounded-xl border border-gray-100 p-4 flex flex-col gap-2">
+              <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-violet-50">
@@ -306,7 +306,7 @@ export default function TaskDashboardPage() {
               </div>
 
               {/* This Week — weekly goal */}
-              <div className="bg-white rounded-xl border border-gray-100 p-4 flex flex-col gap-2">
+              <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-emerald-50">
@@ -328,7 +328,7 @@ export default function TaskDashboardPage() {
               </div>
 
               {/* Weekly Streak — progress to next badge */}
-              <div className="bg-white rounded-xl border border-gray-100 p-4 flex flex-col gap-2">
+              <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-orange-50">
@@ -358,7 +358,7 @@ export default function TaskDashboardPage() {
               </div>
 
               {/* Current Badge */}
-              <div className="bg-white rounded-xl border border-gray-100 p-4 flex flex-col gap-2">
+              <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 flex flex-col gap-2">
                 <div className="flex items-center gap-1.5">
                   <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-amber-50">
                     <i className="ri-medal-line text-amber-500 text-xs" />
@@ -388,7 +388,7 @@ export default function TaskDashboardPage() {
             </div>
 
             {/* Weekly goal explainer strip */}
-            <div className="mt-3 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white border border-gray-100">
+            <div className="mt-3 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800">
               <i className="ri-information-line text-gray-400 text-sm shrink-0" />
               <p className="text-xs text-gray-500">
                 <span className="font-semibold text-gray-700">Weekly Goal:</span> Complete tasks each week to earn badges.
@@ -455,7 +455,7 @@ export default function TaskDashboardPage() {
                 {/* Continue Learning CTA */}
                 {nextTask && (
                   <div
-                    className="bg-white rounded-2xl border border-gray-100 p-4 cursor-pointer hover:border-gray-200 transition-all group"
+                    className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-4 cursor-pointer hover:border-gray-200 transition-all group"
                     onClick={() => setSelectedTask(nextTask)}
                   >
                     <p className="text-xs text-gray-400 font-medium mb-3">Continue where you left off</p>
@@ -496,7 +496,7 @@ export default function TaskDashboardPage() {
                   </div>
                   <div className="flex flex-col gap-3">
                     {priorityTasks.length === 0 ? (
-                      <div className="flex flex-col items-center py-10 gap-2 bg-white rounded-2xl border border-gray-100">
+                      <div className="flex flex-col items-center py-10 gap-2 bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800">
                         <div className="w-12 h-12 flex items-center justify-center rounded-full bg-emerald-100">
                           <i className="ri-check-double-line text-emerald-600 text-xl" />
                         </div>
@@ -510,7 +510,7 @@ export default function TaskDashboardPage() {
                         return (
                           <div
                             key={task.id}
-                            className="bg-white rounded-2xl border border-gray-100 p-4 hover:border-gray-200 transition-all cursor-pointer group"
+                            className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-4 hover:border-gray-200 transition-all cursor-pointer group"
                             onClick={() => setSelectedTask(task)}
                           >
                             <div className="flex items-start gap-3">
@@ -553,7 +553,7 @@ export default function TaskDashboardPage() {
               {/* Right column */}
               <div className="flex flex-col gap-5">
                 {/* Recent Progress */}
-                <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5">
                   <div className="flex items-center gap-2 mb-4">
                     <i className="ri-history-line text-emerald-500 text-base" />
                     <h2 className="font-bold text-gray-900 text-sm">Recent Progress</h2>
@@ -595,7 +595,7 @@ export default function TaskDashboardPage() {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5">
                   <div className="flex items-center gap-2 mb-4">
                     <i className="ri-flashlight-line text-amber-500 text-base" />
                     <h2 className="font-bold text-gray-900 text-sm">Quick Actions</h2>
@@ -636,7 +636,7 @@ export default function TaskDashboardPage() {
 
                 {/* Earned Badges this week */}
                 {BADGE_LEVELS.filter((b) => weeklyCount >= b.threshold).length > 0 && (
-                  <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                  <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5">
                     <div className="flex items-center gap-2 mb-3">
                       <i className="ri-award-line text-amber-500 text-base" />
                       <h2 className="font-bold text-gray-900 text-sm">This Week&apos;s Badges</h2>
@@ -661,7 +661,7 @@ export default function TaskDashboardPage() {
             <div className="flex flex-col gap-8">
               {/* Empty state — shown when no tasks exist */}
               {tasks.length === 0 && (
-                <div className="flex flex-col items-center py-20 gap-4 bg-white rounded-2xl border border-gray-100">
+                <div className="flex flex-col items-center py-20 gap-4 bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800">
                   <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gray-100">
                     <i className="ri-task-line text-gray-300 text-3xl" />
                   </div>
@@ -710,7 +710,7 @@ export default function TaskDashboardPage() {
                         return (
                           <div
                             key={task.id}
-                            className={`bg-white rounded-2xl border p-5 flex flex-col gap-3 cursor-pointer hover:border-gray-200 transition-all group ${task.done ? "opacity-70" : "border-gray-100"}`}
+                            className={`bg-white dark:bg-zinc-900 rounded-2xl border p-5 flex flex-col gap-3 cursor-pointer hover:border-gray-200 transition-all group ${task.done ? "opacity-70" : "border-gray-100"}`}
                             onClick={() => setSelectedTask(task)}
                           >
                             {/* Card top */}

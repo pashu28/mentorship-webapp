@@ -44,7 +44,7 @@ export default function AIMatchCard({ mentor, rank, onSchedule }: AIMatchCardPro
   const rankLabel = rank === 1 ? "Best Match" : rank === 2 ? "2nd Match" : "3rd Match";
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-gray-200 transition-all duration-200">
+    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden hover:border-gray-200 transition-all duration-200">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-2.5 bg-gray-50 border-b border-gray-100">
         <div className="flex items-center gap-2">

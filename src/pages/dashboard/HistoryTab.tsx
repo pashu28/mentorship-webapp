@@ -119,7 +119,7 @@ function SessionsSection() {
         </span>
       </div>
       {completedSessions.map((session) => (
-        <div key={session.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div key={session.id} className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden">
           <div
             className="p-5 cursor-pointer hover:bg-gray-50/50 transition-colors"
             onClick={() => setExpanded(expanded === session.id ? null : session.id)}
@@ -171,7 +171,7 @@ function SessionsSection() {
 
 function TaskTimeline() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5">
+    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5">
       <div className="flex items-center gap-2 mb-5">
         <div className="w-8 h-8 flex items-center justify-center rounded-full bg-violet-50">
           <i className="ri-time-line text-violet-500 text-base" />
@@ -259,7 +259,7 @@ function TasksSection() {
             </div>
             <div className="flex flex-col gap-2">
               {tasks.map((task) => (
-                <div key={task.id} className="bg-white rounded-xl border border-gray-100 p-4 flex items-start gap-3">
+                <div key={task.id} className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 flex items-start gap-3">
                   <div className={`w-5 h-5 flex items-center justify-center rounded shrink-0 mt-0.5 ${statusConfig[key].bg}`}>
                     <i className={`${statusConfig[key].icon} ${statusConfig[key].color} text-xs`} />
                   </div>
@@ -296,7 +296,7 @@ function StreakAndBadgesSection() {
     <div className="flex flex-col gap-5">
 
       {/* Streak stat bar */}
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden">
         <div className="px-5 pt-5 pb-4 border-b border-gray-100 flex items-center gap-3">
           <div className="w-9 h-9 flex items-center justify-center rounded-full bg-orange-50">
             <i className="ri-fire-fill text-orange-500 text-lg" />
@@ -415,7 +415,7 @@ function FeedbackSection() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 flex items-center gap-6">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 flex items-center gap-6">
         <div className="text-center">
           <p className="text-3xl font-bold text-gray-900">{avgRating}</p>
           <StarRating rating={Math.round(parseFloat(avgRating))} size="md" />
@@ -431,7 +431,7 @@ function FeedbackSection() {
       </div>
 
       {menteeFeedbackHistory.map((fb) => (
-        <div key={fb.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div key={fb.id} className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden">
           <div
             className="p-5 cursor-pointer hover:bg-gray-50/50 transition-colors"
             onClick={() => setExpanded(expanded === fb.id ? null : fb.id)}
@@ -513,7 +513,7 @@ function ResourcesSection() {
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">{session}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {resources.map((r) => (
-              <div key={r.id} className="bg-white rounded-xl border border-gray-100 p-4 flex items-start gap-3 hover:border-violet-200 transition-colors cursor-pointer">
+              <div key={r.id} className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 flex items-start gap-3 hover:border-violet-200 transition-colors cursor-pointer">
                 <div className={`w-9 h-9 flex items-center justify-center rounded-lg ${r.color} shrink-0`}>
                   <i className={`${r.icon} text-base`} />
                 </div>

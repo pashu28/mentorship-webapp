@@ -114,24 +114,24 @@ export default function AuthPage() {
       </div>
 
       {/* ── RIGHT PANEL — clean white form ── */}
-      <div className="w-full lg:w-[45%] flex flex-col justify-center px-8 py-12 lg:px-12 bg-white min-h-screen">
+      <div className="w-full lg:w-[45%] flex flex-col justify-center px-8 py-12 lg:px-12 bg-white dark:bg-zinc-950 min-h-screen">
 
         {/* Mobile logo */}
         <div className="flex items-center gap-2.5 mb-10 lg:hidden">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "#7C3AED" }}>
             <i className="ri-sparkling-2-fill text-white" />
           </div>
-          <span className="font-black text-xl text-gray-900 tracking-tight">MentorAI</span>
+          <span className="font-black text-xl text-gray-900 dark:text-zinc-100 tracking-tight">MentorAI</span>
         </div>
 
         <div className="w-full max-w-[380px] mx-auto lg:mx-0">
 
           {/* Heading */}
           <div className="mb-7">
-            <h1 className="text-[1.75rem] font-black text-gray-900 tracking-tight leading-tight mb-1.5">
+            <h1 className="text-[1.75rem] font-black text-gray-900 dark:text-zinc-100 tracking-tight leading-tight mb-1.5">
               {mode === "signup" ? "Create your account" : "Welcome back"}
             </h1>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-400 dark:text-zinc-500 text-sm">
               {mode === "signup"
                 ? "Join 18,000+ learners growing with expert mentors."
                 : "Sign in to continue your learning journey."}
@@ -139,7 +139,7 @@ export default function AuthPage() {
           </div>
 
           {/* Tab toggle */}
-          <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+          <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-xl p-1 mb-6">
             {(["signup", "login"] as const).map((m) => (
               <button
                 key={m}
@@ -162,7 +162,7 @@ export default function AuthPage() {
               <button
                 key={s.label}
                 type="button"
-                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm font-medium text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-300 dark:hover:border-zinc-600 transition-all cursor-pointer"
               >
                 <i className={`${s.icon} text-base`} style={{ color: s.color }} />
                 {s.label}
@@ -172,9 +172,9 @@ export default function AuthPage() {
 
           {/* Divider */}
           <div className="flex items-center gap-3 mb-5">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400">or continue with email</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px bg-gray-200 dark:bg-zinc-700" />
+            <span className="text-xs text-gray-400 dark:text-zinc-500">or continue with email</span>
+            <div className="flex-1 h-px bg-gray-200 dark:bg-zinc-700" />
           </div>
 
           {/* Form */}
@@ -189,7 +189,7 @@ export default function AuthPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Alex Johnson"
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder-gray-300 outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900 text-sm text-gray-900 dark:text-zinc-100 placeholder-gray-300 dark:placeholder-zinc-600 outline-none transition-all"
                     onFocus={(e) => { e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.background = "#faf5ff"; }}
                     onBlur={(e) => { e.currentTarget.style.borderColor = "#e5e7eb"; e.currentTarget.style.background = "#f9fafb"; }}
                   />
@@ -206,7 +206,7 @@ export default function AuthPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="alex@example.com"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder-gray-300 outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900 text-sm text-gray-900 dark:text-zinc-100 placeholder-gray-300 dark:placeholder-zinc-600 outline-none transition-all"
                   onFocus={(e) => { e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.background = "#faf5ff"; }}
                   onBlur={(e) => { e.currentTarget.style.borderColor = "#e5e7eb"; e.currentTarget.style.background = "#f9fafb"; }}
                 />
@@ -229,7 +229,7 @@ export default function AuthPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder-gray-300 outline-none transition-all"
+                    className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900 text-sm text-gray-900 dark:text-zinc-100 placeholder-gray-300 dark:placeholder-zinc-600 outline-none transition-all"
                   onFocus={(e) => { e.currentTarget.style.borderColor = "#7C3AED"; e.currentTarget.style.background = "#faf5ff"; }}
                   onBlur={(e) => { e.currentTarget.style.borderColor = "#e5e7eb"; e.currentTarget.style.background = "#f9fafb"; }}
                 />
@@ -255,7 +255,7 @@ export default function AuthPage() {
           </form>
 
           {/* Switch mode */}
-          <p className="text-center text-sm text-gray-400 mt-5">
+          <p className="text-center text-sm text-gray-400 dark:text-zinc-500 mt-5">
             {mode === "signup" ? "Already have an account? " : "Don't have an account? "}
             <button
               type="button"
@@ -268,13 +268,13 @@ export default function AuthPage() {
           </p>
 
           {/* Trust badges */}
-          <div className="flex items-center justify-center gap-5 mt-7 pt-6 border-t border-gray-100">
+          <div className="flex items-center justify-center gap-5 mt-7 pt-6 border-t border-gray-100 dark:border-zinc-800">
             {[
               { icon: "ri-shield-check-line", text: "Secure & Private" },
               { icon: "ri-star-fill", text: "4.9 / 5 Rating" },
               { icon: "ri-group-line", text: "18K+ Members" },
             ].map((b) => (
-              <div key={b.text} className="flex items-center gap-1.5 text-gray-400 text-[11px]">
+              <div key={b.text} className="flex items-center gap-1.5 text-gray-400 dark:text-zinc-500 text-[11px]">
                 <i className={`${b.icon} text-xs`} />
                 {b.text}
               </div>

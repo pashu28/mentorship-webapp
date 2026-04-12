@@ -43,9 +43,9 @@ export default function ResourcesPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[#F8F8FA]">
+      <div className="min-h-screen bg-[#F8F8FA] dark:bg-zinc-950">
         {/* Header */}
-        <div className="bg-white border-b border-gray-100 px-8 py-6">
+        <div className="bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 px-8 py-6">
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1">

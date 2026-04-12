@@ -33,7 +33,7 @@ export default function MentorCard({ mentor, rank, onSchedule }: MentorCardProps
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4 hover:border-gray-200 transition-all duration-200 flex gap-4">
+    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 hover:border-gray-200 transition-all duration-200 flex gap-4">
       {/* Rank */}
       <div className="w-6 h-6 flex items-center justify-center shrink-0 mt-1">
         <span className="text-xs font-bold text-gray-300">#{rank}</span>
@@ -72,7 +72,7 @@ export default function MentorCard({ mentor, rank, onSchedule }: MentorCardProps
         {/* Expertise */}
         <div className="flex flex-wrap gap-1.5 mt-2">
           {mentor.expertise.slice(0, 3).map((tag) => (
-            <span key={tag} className="text-xs px-2 py-0.5 bg-gray-50 text-gray-500 rounded-full border border-gray-100">
+            <span key={tag} className="text-xs px-2 py-0.5 bg-gray-50 text-gray-500 rounded-full border border-gray-100 dark:border-zinc-800">
               {tag}
             </span>
           ))}

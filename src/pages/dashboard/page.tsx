@@ -192,7 +192,7 @@ export default function DashboardPage() {
                 : 100;
 
               return (
-                <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5">
                   <div className="flex items-center gap-2 mb-5">
                     <i className="ri-fire-fill text-orange-500 text-lg" />
                     <h2 className="font-bold text-gray-900">Task Streak</h2>
@@ -246,7 +246,7 @@ export default function DashboardPage() {
             })()}
 
             {/* Focus Path */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 flex-1">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 flex-1">
               <div className="flex items-center gap-2 mb-5">
                 <i className="ri-focus-3-line text-violet-500 text-lg" />
                 <h2 className="font-bold text-gray-900">Your Focus Path</h2>
@@ -323,7 +323,7 @@ export default function DashboardPage() {
           {/* Center col: Next Session + Last Session Summary */}
           <div className="lg:col-span-1 flex flex-col gap-5">
             {/* Next Session */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5">
               <div className="flex items-center gap-2 mb-4">
                 <i className="ri-calendar-event-line text-violet-500 text-lg" />
                 <h2 className="font-bold text-gray-900">Next Session</h2>
@@ -391,7 +391,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Last Session Summary */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 flex-1">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 flex-1">
               <div className="flex items-center gap-2 mb-4">
                 <i className="ri-file-list-3-line text-emerald-500 text-lg" />
                 <h2 className="font-bold text-gray-900">Last Session</h2>
@@ -437,7 +437,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Recent Progress */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 flex-1">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 flex-1">
               <div className="flex items-center gap-2 mb-4">
                 <i className="ri-trophy-line text-amber-500 text-lg" />
                 <h2 className="font-bold text-gray-900">Recent Progress</h2>

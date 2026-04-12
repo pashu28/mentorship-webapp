@@ -82,7 +82,7 @@ function FilterDropdown({ label, icon, value, options, optionIcons, onChange, ac
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-1.5 bg-white border border-gray-100 rounded-xl py-1.5 z-50 min-w-[160px]"
+        <div className="absolute top-full left-0 mt-1.5 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-xl py-1.5 z-50 min-w-[160px]"
           style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}
         >
           {options.map((opt) => (

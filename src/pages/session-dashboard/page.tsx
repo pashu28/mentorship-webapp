@@ -136,12 +136,12 @@ export default function SessionDashboardPage() {
             return (
               <div
                 key={session.id}
-                className="bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all duration-200"
+                className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden transition-all duration-200"
               >
                 {/* Card main row */}
                 <div className="flex items-center gap-5 p-5">
                   {/* Date block */}
-                  <div className="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gray-50 border border-gray-100 shrink-0">
+                  <div className="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gray-50 border border-gray-100 dark:border-zinc-800 shrink-0">
                     <span className="text-xs font-semibold text-gray-400 uppercase">{session.month}</span>
                     <span className="text-xl font-black text-gray-900 leading-tight">{session.day}</span>
                   </div>
@@ -151,7 +151,7 @@ export default function SessionDashboardPage() {
                     <img
                       src={session.mentorPhoto}
                       alt={session.mentorName}
-                      className="w-10 h-10 rounded-full object-cover object-top border border-gray-100 shrink-0"
+                      className="w-10 h-10 rounded-full object-cover object-top border border-gray-100 dark:border-zinc-800 shrink-0"
                     />
                     <div className="min-w-0">
                       <p className="font-semibold text-gray-900 text-sm truncate">{session.mentorName}</p>

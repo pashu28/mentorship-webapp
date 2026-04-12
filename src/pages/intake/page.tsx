@@ -32,9 +32,9 @@ export default function IntakePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-zinc-950 flex flex-col">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 bg-white border-b border-gray-100">
+      <nav className="flex items-center justify-between px-8 py-5 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800">
         <div className="flex items-center gap-2.5">
           <img src="https://public.readdy.ai/ai/img_res/c1296ba1-3a0e-4b18-b1f8-e3ff105a92d8.png" alt="MentorAI" className="w-8 h-8 object-contain" />
           <span className="font-bold text-gray-900 text-lg">MentorAI</span>

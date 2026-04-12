@@ -61,7 +61,7 @@ export default function SubscriptionTab() {
   return (
     <div className="space-y-5">
       {/* Current plan banner */}
-      <div className="bg-white border border-gray-100 rounded-2xl p-5 flex items-center justify-between">
+      <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-5 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 shrink-0">
             <i className="ri-vip-crown-line text-gray-500 text-lg" />
@@ -97,10 +97,10 @@ export default function SubscriptionTab() {
         {PLANS.map((plan) => (
           <div
             key={plan.id}
-            className={`bg-white rounded-2xl p-5 flex flex-col gap-4 relative ${
+            className={`bg-white dark:bg-zinc-900 rounded-2xl p-5 flex flex-col gap-4 relative ${
               plan.highlight
                 ? "border-2 border-violet-400"
-                : "border border-gray-100"
+                : "border border-gray-100 dark:border-zinc-800"
             }`}
           >
             {plan.highlight && (
@@ -148,7 +148,7 @@ export default function SubscriptionTab() {
       </div>
 
       {/* Usage */}
-      <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
+      <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-6 space-y-4">
         <h3 className="text-sm font-semibold text-gray-900">This Month&apos;s Usage</h3>
         {[
           { label: "Mentor Sessions",  used: 1, total: 2,   unit: "sessions" },

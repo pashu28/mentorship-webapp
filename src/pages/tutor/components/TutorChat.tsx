@@ -57,7 +57,7 @@ export default function TutorChat({ conversation, isTyping, suggestedTopics, onS
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#F8F8FA]">
       {/* Top bar */}
-      <div className="flex items-center gap-3 px-6 py-4 bg-white border-b border-gray-100 shrink-0">
+      <div className="flex items-center gap-3 px-6 py-4 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 shrink-0">
         <div className="w-8 h-8 flex items-center justify-center rounded-full bg-violet-600 shrink-0">
           <i className="ri-sparkling-2-fill text-white text-sm" />
         </div>

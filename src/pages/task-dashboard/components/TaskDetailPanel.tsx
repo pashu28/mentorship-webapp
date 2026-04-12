@@ -287,11 +287,11 @@ export default function TaskDetailPanel({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4">
       <div
         ref={panelRef}
-        className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
         style={{ boxShadow: "0 24px 64px rgba(0,0,0,0.12)" }}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-start gap-3 z-10">
+        <div className="sticky top-0 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 px-6 py-4 flex items-start gap-3 z-10">
           <div className={`w-2.5 h-2.5 rounded-full ${dotColor} mt-1.5 shrink-0`} />
           <div className="flex-1 min-w-0">
             <p className="text-xs text-gray-400 font-medium">{stepTitle}</p>

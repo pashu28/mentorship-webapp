@@ -61,9 +61,9 @@ export default function FindMentorPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[#F8F8FA]">
+      <div className="min-h-screen bg-[#F8F8FA] dark:bg-zinc-950">
         {/* Header */}
-        <div className="bg-white border-b border-gray-100 px-6 py-6">
+        <div className="bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 px-6 py-6">
           <div className="max-w-5xl mx-auto w-full">
             <div className="flex items-start justify-between gap-6">
               <div>

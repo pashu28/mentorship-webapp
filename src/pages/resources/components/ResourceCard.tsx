@@ -27,7 +27,7 @@ export default function ResourceCard({ resource, onToggleStar, view }: ResourceC
 
   if (view === "session") {
     return (
-      <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100 hover:border-gray-200 transition-all group">
+      <div className="flex items-start gap-3 p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 hover:border-gray-200 transition-all group">
         <div className={`w-9 h-9 flex items-center justify-center rounded-lg shrink-0 ${fmt.bg}`}>
           <i className={`${fmt.icon} ${fmt.color} text-base`} />
         </div>
@@ -49,7 +49,7 @@ export default function ResourceCard({ resource, onToggleStar, view }: ResourceC
   }
 
   return (
-    <div className="flex items-start gap-4 px-5 py-4 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 transition-all group">
+    <div className="flex items-start gap-4 px-5 py-4 bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 hover:border-gray-200 transition-all group">
       {/* Format icon */}
       <div className={`w-10 h-10 flex items-center justify-center rounded-xl shrink-0 ${fmt.bg}`}>
         <i className={`${fmt.icon} ${fmt.color} text-lg`} />
