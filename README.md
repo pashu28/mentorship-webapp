@@ -1,5 +1,12 @@
 # MentorAI — AI-Powered Mentorship Platform
 
+## Try it live
+
+> **[Open MentorAI live website →](https://pashu28.github.io/mentorship-webapp/)**  
+
+
+---
+
 MentorAI connects mentees with expert mentors through intelligent AI matching, live video sessions with real-time AI transcription, and post-session synthesis. The platform guides users from onboarding through a structured learning journey with an AI tutor and progress tracking dashboard.
 
 ---
