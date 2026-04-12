@@ -26,13 +26,13 @@ export default function ProfilePage() {
       <div className="px-6 py-8 w-full">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-zinc-100">Profile &amp; Settings</h1>
-          <p className="text-sm text-gray-400 dark:text-zinc-500 mt-1">Manage your account, preferences, and subscription</p>
+          <h1 className="text-xl font-bold text-gray-900">Profile &amp; Settings</h1>
+          <p className="text-sm text-gray-400 mt-1">Manage your account, preferences, and subscription</p>
         </div>
 
         <div className="flex gap-6 items-start max-w-5xl">
           {/* Sidebar tabs */}
-          <aside className="w-48 shrink-0 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-2 sticky top-6">
+          <aside className="w-48 shrink-0 bg-white border border-gray-100 rounded-2xl p-2 sticky top-6">
             <nav className="flex flex-col gap-0.5">
               {TABS.map((tab) => {
                 const active = activeTab === tab.id;
@@ -43,8 +43,8 @@ export default function ProfilePage() {
                     onClick={() => setTab(tab.id)}
                     className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer whitespace-nowrap w-full text-left ${
                       active
-                        ? "bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300"
-                        : "text-gray-500 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-gray-800 dark:hover:text-zinc-200"
+                        ? "bg-violet-50 text-violet-700"
+                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
                     }`}
                   >
                     <div className="w-4 h-4 flex items-center justify-center shrink-0">
@@ -57,11 +57,11 @@ export default function ProfilePage() {
               })}
 
               {/* Sign out */}
-              <div className="border-t border-gray-100 dark:border-zinc-800 mt-1 pt-1">
+              <div className="border-t border-gray-100 mt-1 pt-1">
                 <button
                   type="button"
                   onClick={() => navigate("/")}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all cursor-pointer whitespace-nowrap w-full text-left"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all cursor-pointer whitespace-nowrap w-full text-left"
                 >
                   <div className="w-4 h-4 flex items-center justify-center shrink-0">
                     <i className="ri-logout-box-r-line text-sm" />

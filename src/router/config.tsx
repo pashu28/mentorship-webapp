@@ -13,6 +13,7 @@ import TutorPage from "@/pages/tutor/page";
 import FindMentorPage from "@/pages/find-mentor/page";
 import ResourcesPage from "@/pages/resources/page";
 import ProfilePage from "@/pages/profile/page";
+import AchievementsPage from "@/pages/achievements/page";
 import NotFound from "@/pages/NotFound";
 
 const routes: RouteObject[] = [
@@ -30,6 +31,7 @@ const routes: RouteObject[] = [
   { path: "/find-mentor", element: <FindMentorPage /> },
   { path: "/resources", element: <ResourcesPage /> },
   { path: "/profile", element: <ProfilePage /> },
+  { path: "/achievements", element: <AchievementsPage /> },
   { path: "*", element: <NotFound /> },
 ];
 

@@ -4,23 +4,13 @@ import { resolve } from "node:path";
 import AutoImport from "unplugin-auto-import/vite";
 // import { readdyJsxRuntimeProxyPlugin } from "./vite.jsx-runtime-proxy";
 
-const rawBase = process.env.BASE_PATH || "/";
-/** Vite asset base: must end with `/` except root is `/`. */
-const base =
-  rawBase === "/"
-    ? "/"
-    : rawBase.endsWith("/")
-      ? rawBase
-      : `${rawBase}/`;
-/** React Router basename: leading slash, no trailing slash; empty at root. */
-const routerBasename =
-  base === "/" ? "" : base.replace(/\/$/, "");
+const base = process.env.BASE_PATH || "/";
 const isPreview = process.env.IS_PREVIEW ? true : false;
 //const proxyPlugins = isPreview ? [readdyJsxRuntimeProxyPlugin()] : [];
 // https://vite.dev/config/
 export default defineConfig({
   define: {
-    __BASE_PATH__: JSON.stringify(routerBasename),
+    __BASE_PATH__: JSON.stringify(base),
     __IS_PREVIEW__: JSON.stringify(isPreview),
     __READDY_PROJECT_ID__: JSON.stringify(process.env.PROJECT_ID || ""),
     __READDY_VERSION_ID__: JSON.stringify(process.env.VERSION_ID || ""),

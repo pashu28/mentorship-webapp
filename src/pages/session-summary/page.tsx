@@ -4,11 +4,12 @@ import { resourceVault, roadmapSteps } from "@/mocks/session";
 import SessionFeedbackModal, { FeedbackData } from "./SessionFeedbackModal";
 
 export default function SessionSummaryPage() {
-  const [tasks, setTasks] = useState(() =>
-    roadmapSteps.map((step) => ({
-      ...step,
-      tasks: step.tasks.map((t) => ({ ...t })),
-    }))
+  const [tasks, setTasks] = useState(
+    roadmapSteps.map((step) =>
+      step.tasks.map((t) => ({ ...t, checked: false }))
+        ? { ...step, tasks: step.tasks.map((t) => ({ ...t, checked: false })) }
+        : step
+    )
   );
   const [showFeedback, setShowFeedback] = useState(true);
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function SessionSummaryPage() {
           ? {
               ...step,
               tasks: step.tasks.map((t) =>
-                t.id === taskId ? { ...t, done: !t.done } : t
+                t.id === taskId ? { ...t, checked: !t.checked } : t
               ),
             }
           : step
@@ -37,7 +38,7 @@ export default function SessionSummaryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F7F7] dark:bg-zinc-950 flex flex-col">
+    <div className="min-h-screen bg-[#F7F7F7] flex flex-col">
       {showFeedback && (
         <SessionFeedbackModal
           mentorName="Sarah Chen"
@@ -50,7 +51,7 @@ export default function SessionSummaryPage() {
       )}
 
       {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-4 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800">
+      <nav className="flex items-center justify-between px-8 py-4 bg-white border-b border-gray-100">
         <div className="flex items-center gap-2.5">
           <img
             src="https://public.readdy.ai/ai/img_res/c1296ba1-3a0e-4b18-b1f8-e3ff105a92d8.png"
@@ -102,7 +103,7 @@ export default function SessionSummaryPage() {
                 href={`https://${r.url}`}
                 target="_blank"
                 rel="nofollow noreferrer"
-                className="group flex items-center gap-3 p-3.5 bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 hover:border-gray-200 transition-all duration-200 cursor-pointer"
+                className="group flex items-center gap-3 p-3.5 bg-white rounded-xl border border-gray-100 hover:border-gray-200 transition-all duration-200 cursor-pointer"
               >
                 <div
                   className={`w-9 h-9 flex items-center justify-center rounded-lg ${r.color} shrink-0`}
@@ -135,7 +136,7 @@ export default function SessionSummaryPage() {
             {tasks.map((step, idx) => (
               <div
                 key={step.id}
-                className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 overflow-hidden"
+                className="bg-white rounded-xl border border-gray-100 overflow-hidden"
               >
                 {/* Step header */}
                 <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
@@ -158,18 +159,18 @@ export default function SessionSummaryPage() {
                     >
                       <div
                         className={`w-4 h-4 flex items-center justify-center rounded border-2 shrink-0 transition-all ${
-                          task.done
+                          (task as typeof task & { checked?: boolean }).checked
                             ? "border-violet-500 bg-violet-500"
                             : "border-gray-300 group-hover:border-gray-400"
                         }`}
                       >
-                        {task.done && (
+                        {(task as typeof task & { checked?: boolean }).checked && (
                           <i className="ri-check-line text-white text-[10px]" />
                         )}
                       </div>
                       <span
                         className={`text-sm leading-relaxed transition-colors ${
-                          task.done
+                          (task as typeof task & { checked?: boolean }).checked
                             ? "text-gray-400 line-through"
                             : "text-gray-700"
                         }`}
@@ -186,7 +187,7 @@ export default function SessionSummaryPage() {
       </main>
 
       {/* Floating Bottom Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 px-8 py-4 flex items-center justify-between">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-8 py-4 flex items-center justify-between">
         <div>
           <p className="text-sm font-semibold text-gray-900">Ready to start your journey?</p>
           <p className="text-xs text-gray-500">Add this roadmap to your personal dashboard</p>

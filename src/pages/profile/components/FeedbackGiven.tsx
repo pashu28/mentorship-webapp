@@ -67,7 +67,7 @@ export default function FeedbackGiven() {
       </div>
 
       {FEEDBACK.map((fb) => (
-        <div key={fb.id} className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-5 space-y-4">
+        <div key={fb.id} className="bg-white border border-gray-100 rounded-2xl p-5 space-y-4">
           {/* Mentor info */}
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">

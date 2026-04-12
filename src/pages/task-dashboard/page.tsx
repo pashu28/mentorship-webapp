@@ -6,38 +6,26 @@ import TaskCompleteEffect from "@/pages/dashboard/TaskCompleteEffect";
 import MilestoneBadge from "@/pages/dashboard/MilestoneBadge";
 import TaskDetailScreen from "./components/TaskDetailScreen";
 import { mainTasks as initialTasks, goalRingsData, type MainTask } from "@/mocks/taskDashboard";
+import { BADGE_DEFS, CREDITS_PER_TASK, achievementStats } from "@/mocks/achievements";
 
-// ── Weekly badge thresholds ────────────────────────────────────────────────
-const BADGE_LEVELS = [
-  { threshold: 3, name: "Rising Star",  icon: "ri-star-fill",     color: "text-amber-500",   bg: "bg-amber-50",   border: "border-amber-200" },
-  { threshold: 5, name: "Week Warrior", icon: "ri-rocket-2-fill", color: "text-violet-500",  bg: "bg-violet-50",  border: "border-violet-200" },
-  { threshold: 7, name: "Champion",     icon: "ri-trophy-fill",   color: "text-emerald-500", bg: "bg-emerald-50", border: "border-emerald-200" },
-];
-
-// ── Weekly goal config ─────────────────────────────────────────────────────
-const WEEKLY_GOAL = 7; // tasks per week to hit Champion
-
-function getWeekStart(date: Date): Date {
-  const d = new Date(date);
-  const day = d.getDay(); // 0=Sun, 1=Mon...
-  const diff = (day === 0 ? -6 : 1 - day); // shift to Monday
-  d.setDate(d.getDate() + diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
+// ── Credits logic helpers ──────────────────────────────────────────────────
+function calcCredits(tasksCompleted: number): number {
+  const fromTasks = tasksCompleted * CREDITS_PER_TASK;
+  const fromBadges = BADGE_DEFS.filter((b) => tasksCompleted >= b.tasksRequired)
+    .reduce((sum, b) => sum + b.bonusCredits, 0);
+  return fromTasks + fromBadges;
 }
 
-function formatWeekRange(weekStart: Date): string {
-  const end = new Date(weekStart);
-  end.setDate(end.getDate() + 6);
-  const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
-  return `${weekStart.toLocaleDateString("en-US", opts)} – ${end.toLocaleDateString("en-US", opts)}`;
+function getEarnedBadges(tasksCompleted: number) {
+  return BADGE_DEFS.filter((b) => tasksCompleted >= b.tasksRequired);
 }
 
-function getCurrentBadge(count: number) {
-  return [...BADGE_LEVELS].reverse().find((b) => count >= b.threshold) ?? null;
+function getNextBadge(tasksCompleted: number) {
+  return BADGE_DEFS.find((b) => tasksCompleted < b.tasksRequired) ?? null;
 }
-function getNextBadge(count: number) {
-  return BADGE_LEVELS.find((b) => count < b.threshold) ?? null;
+
+function getLatestBadge(tasksCompleted: number) {
+  return [...BADGE_DEFS].reverse().find((b) => tasksCompleted >= b.tasksRequired) ?? null;
 }
 
 // ── Mentor mock data ───────────────────────────────────────────────────────
@@ -45,11 +33,11 @@ const MENTOR = { name: "Sarah Chen", avatar: "SC", title: "Senior UX Designer at
 
 const STEP_STYLE = {
   violet: {
-    dot: "bg-violet-500",
-    bar: "bg-violet-500",
+    dot: "bg-violet-600",
+    bar: "bg-violet-600",
     badge: "bg-violet-50 text-violet-700 border-violet-200",
     text: "text-violet-600",
-    iconBg: "bg-violet-100",
+    iconBg: "bg-violet-50",
     iconText: "text-violet-600",
     cardBorder: "border-violet-100",
     cardAccent: "bg-violet-50",
@@ -58,60 +46,48 @@ const STEP_STYLE = {
     ring: { color: "stroke-violet-600", bg: "stroke-violet-200" },
   },
   emerald: {
-    dot: "bg-emerald-500",
-    bar: "bg-emerald-500",
-    badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    text: "text-emerald-600",
-    iconBg: "bg-emerald-100",
-    iconText: "text-emerald-600",
-    cardBorder: "border-emerald-100",
-    cardAccent: "bg-emerald-50",
-    btn: "bg-emerald-600 hover:bg-emerald-700",
-    btnOutline: "border-emerald-200 text-emerald-600 hover:bg-emerald-50",
-    ring: { color: "stroke-emerald-600", bg: "stroke-emerald-200" },
+    dot: "bg-violet-400",
+    bar: "bg-violet-400",
+    badge: "bg-violet-50 text-violet-600 border-violet-200",
+    text: "text-violet-500",
+    iconBg: "bg-violet-50",
+    iconText: "text-violet-500",
+    cardBorder: "border-violet-100",
+    cardAccent: "bg-violet-50",
+    btn: "bg-violet-500 hover:bg-violet-600",
+    btnOutline: "border-violet-200 text-violet-500 hover:bg-violet-50",
+    ring: { color: "stroke-violet-400", bg: "stroke-violet-100" },
   },
   amber: {
-    dot: "bg-amber-500",
-    bar: "bg-amber-500",
-    badge: "bg-amber-50 text-amber-700 border-amber-200",
-    text: "text-amber-600",
-    iconBg: "bg-amber-100",
-    iconText: "text-amber-600",
-    cardBorder: "border-amber-100",
-    cardAccent: "bg-amber-50",
-    btn: "bg-amber-500 hover:bg-amber-600",
-    btnOutline: "border-amber-200 text-amber-600 hover:bg-amber-50",
-    ring: { color: "stroke-amber-500", bg: "stroke-amber-200" },
+    dot: "bg-violet-300",
+    bar: "bg-violet-300",
+    badge: "bg-violet-50 text-violet-500 border-violet-100",
+    text: "text-violet-400",
+    iconBg: "bg-violet-50",
+    iconText: "text-violet-400",
+    cardBorder: "border-violet-100",
+    cardAccent: "bg-violet-50",
+    btn: "bg-violet-400 hover:bg-violet-500",
+    btnOutline: "border-violet-100 text-violet-400 hover:bg-violet-50",
+    ring: { color: "stroke-violet-300", bg: "stroke-violet-100" },
   },
 };
 
 type TabId = "overview" | "tasks";
 
-// ── Persist weekly progress in localStorage ────────────────────────────────
-const STORAGE_KEY = "task_weekly_progress";
+// ── Persist total completed tasks in localStorage ──────────────────────────
+const STORAGE_KEY = "task_total_completed";
 
-interface WeeklyProgress {
-  weekStart: string; // ISO date string
-  completedThisWeek: number;
-  earnedBadges: number[]; // thresholds already awarded this week
-}
-
-function loadWeeklyProgress(): WeeklyProgress {
+function loadTotalCompleted(): number {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed: WeeklyProgress = JSON.parse(raw);
-      const storedWeek = new Date(parsed.weekStart);
-      const currentWeek = getWeekStart(new Date());
-      // If stored week matches current week, use it; otherwise reset
-      if (storedWeek.getTime() === currentWeek.getTime()) return parsed;
-    }
+    if (raw) return parseInt(raw, 10) || 0;
   } catch (_) { /* ignore */ }
-  return { weekStart: getWeekStart(new Date()).toISOString(), completedThisWeek: 0, earnedBadges: [] };
+  return achievementStats.totalTasksCompleted; // seed with mock data
 }
 
-function saveWeeklyProgress(p: WeeklyProgress) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
+function saveTotalCompleted(n: number) {
+  localStorage.setItem(STORAGE_KEY, String(n));
 }
 
 export default function TaskDashboardPage() {
@@ -125,22 +101,21 @@ export default function TaskDashboardPage() {
   const [selectedTask, setSelectedTask] = useState<MainTask | null>(null);
   const [showEffect, setShowEffect] = useState(false);
   const [showBadge, setShowBadge] = useState(false);
-  const [badgeStreak, setBadgeStreak] = useState(0);
+  const [newBadgeName, setNewBadgeName] = useState(0);
 
-  // ── Weekly progress state ────────────────────────────────────────────────
-  const [weeklyProgress, setWeeklyProgress] = useState<WeeklyProgress>(loadWeeklyProgress);
+  // ── Credits / tasks state ────────────────────────────────────────────────
+  const [totalCompleted, setTotalCompleted] = useState<number>(loadTotalCompleted);
 
-  const weekStart = getWeekStart(new Date());
-  const weekRange = formatWeekRange(weekStart);
-  const weeklyCount = weeklyProgress.completedThisWeek;
-  const weeklyPct = Math.min(Math.round((weeklyCount / WEEKLY_GOAL) * 100), 100);
+  const totalCredits = calcCredits(totalCompleted);
+  const earnedBadges = getEarnedBadges(totalCompleted);
+  const nextBadge = getNextBadge(totalCompleted);
+  const latestBadge = getLatestBadge(totalCompleted);
 
-  const currentBadge = getCurrentBadge(weeklyCount);
-  const nextBadge = getNextBadge(weeklyCount);
-  const prevThreshold = currentBadge ? currentBadge.threshold : 0;
-  const nextThreshold = nextBadge ? nextBadge.threshold : WEEKLY_GOAL;
-  const badgePct = nextBadge
-    ? Math.round(((weeklyCount - prevThreshold) / (nextThreshold - prevThreshold)) * 100)
+  // Progress to next badge
+  const prevBadgeThreshold = latestBadge ? latestBadge.tasksRequired : 0;
+  const nextBadgeThreshold = nextBadge ? nextBadge.tasksRequired : (latestBadge?.tasksRequired ?? 1);
+  const badgeProgressPct = nextBadge
+    ? Math.min(Math.round(((totalCompleted - prevBadgeThreshold) / (nextBadgeThreshold - prevBadgeThreshold)) * 100), 100)
     : 100;
 
   useEffect(() => {
@@ -158,22 +133,18 @@ export default function TaskDashboardPage() {
     setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, done: true } : t)));
     setShowEffect(true);
 
-    setWeeklyProgress((prev) => {
-      const next = prev.completedThisWeek + 1;
-      const newProgress: WeeklyProgress = { ...prev, completedThisWeek: next };
+    setTotalCompleted((prev) => {
+      const next = prev + 1;
+      saveTotalCompleted(next);
 
-      // Check if a new badge threshold is crossed this week
-      const newBadge = BADGE_LEVELS.find(
-        (b) => b.threshold === next && !prev.earnedBadges.includes(b.threshold)
-      );
+      // Check if a new badge just unlocked
+      const newBadge = BADGE_DEFS.find((b) => b.tasksRequired === next);
       if (newBadge) {
-        newProgress.earnedBadges = [...prev.earnedBadges, newBadge.threshold];
-        setBadgeStreak(next);
+        setNewBadgeName(next);
         setShowBadge(true);
       }
 
-      saveWeeklyProgress(newProgress);
-      return newProgress;
+      return next;
     });
   }, []);
 
@@ -221,7 +192,7 @@ export default function TaskDashboardPage() {
   return (
     <AppLayout>
       <TaskCompleteEffect visible={showEffect} onDone={() => setShowEffect(false)} />
-      <MilestoneBadge streak={badgeStreak} visible={showBadge} onDismiss={() => setShowBadge(false)} />
+      <MilestoneBadge streak={newBadgeName} visible={showBadge} onDismiss={() => setShowBadge(false)} />
 
       {selectedTask && (
         <TaskDetailScreen
@@ -232,7 +203,7 @@ export default function TaskDashboardPage() {
         />
       )}
 
-      <div className="w-full min-h-screen bg-[#F7F8FA] dark:bg-zinc-950">
+      <div className="w-full min-h-screen bg-[#F7F8FA]">
         {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="bg-[#F7F8FA] px-6 pt-8 pb-6">
           <div className="max-w-7xl mx-auto">
@@ -264,7 +235,7 @@ export default function TaskDashboardPage() {
                 const col = stepGroups[i].color;
                 const style = STEP_STYLE[col];
                 return (
-                  <div key={ring.id} className="flex items-center gap-4 bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-gray-100 dark:border-zinc-800">
+                  <div key={ring.id} className="flex items-center gap-4 bg-white rounded-2xl p-4 border border-gray-100">
                     <GoalRing label="" percentage={pct} color={ring.color} bgColor={ring.bg} size={68} />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-gray-400 font-medium mb-0.5">{stepGroups[i].label}</p>
@@ -281,10 +252,11 @@ export default function TaskDashboardPage() {
               })}
             </div>
 
-            {/* Stats Row */}
+            {/* Stats Row — 4 cards, all credits-based */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+
               {/* Overall Progress */}
-              <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 flex flex-col gap-2">
+              <div className="bg-white rounded-xl border border-gray-100 p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-violet-50">
@@ -305,105 +277,111 @@ export default function TaskDashboardPage() {
                 </div>
               </div>
 
-              {/* This Week — weekly goal */}
-              <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 flex flex-col gap-2">
+              {/* Total Credits */}
+              <div className="bg-white rounded-xl border border-gray-100 p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-emerald-50">
-                      <i className="ri-calendar-check-line text-emerald-500 text-xs" />
+                      <i className="ri-copper-coin-line text-emerald-600 text-xs" />
                     </div>
-                    <p className="text-xs text-gray-400 font-medium">This Week</p>
+                    <p className="text-xs text-gray-400 font-medium">Total Credits</p>
                   </div>
-                  <span className="text-xs font-bold text-emerald-600">{weeklyPct}%</span>
+                  <span className="text-xs font-bold text-emerald-600">+{CREDITS_PER_TASK}/task</span>
                 </div>
                 <p className="text-2xl font-black text-gray-900 leading-none">
-                  {weeklyCount}<span className="text-sm font-medium text-gray-300 ml-1">/ {WEEKLY_GOAL}</span>
+                  {totalCredits}<span className="text-sm font-medium text-gray-300 ml-1">cr</span>
                 </p>
                 <div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-400 rounded-full transition-all duration-700" style={{ width: `${weeklyPct}%` }} />
-                  </div>
-                  <p className="text-xs text-gray-400 mt-1">{weekRange}</p>
+                  <p className="text-xs text-gray-400">
+                    {totalCompleted} tasks × {CREDITS_PER_TASK} = {totalCompleted * CREDITS_PER_TASK}
+                    {earnedBadges.length > 0 && (
+                      <span className="text-emerald-500 font-medium"> + {totalCredits - totalCompleted * CREDITS_PER_TASK} bonus</span>
+                    )}
+                  </p>
                 </div>
               </div>
 
-              {/* Weekly Streak — progress to next badge */}
-              <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 flex flex-col gap-2">
+              {/* Next Badge Progress */}
+              <div className="bg-white rounded-xl border border-gray-100 p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-orange-50">
-                      <i className="ri-fire-fill text-orange-500 text-xs" />
+                    <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-violet-50">
+                      <i className="ri-medal-line text-violet-500 text-xs" />
                     </div>
-                    <p className="text-xs text-gray-400 font-medium">Weekly Streak</p>
+                    <p className="text-xs text-gray-400 font-medium">Next Badge</p>
                   </div>
-                  {nextBadge && <span className="text-xs font-bold text-orange-500">{badgePct}%</span>}
+                  {nextBadge && <span className="text-xs font-bold text-violet-600">{badgeProgressPct}%</span>}
                 </div>
-                <p className="text-2xl font-black text-gray-900 leading-none">
-                  {weeklyCount}<span className="text-sm font-medium text-gray-300 ml-1">tasks</span>
-                </p>
-                <div>
-                  {nextBadge ? (
-                    <>
+                {nextBadge ? (
+                  <>
+                    <div className="flex items-center gap-1.5">
+                      <i className={`${nextBadge.icon} text-lg ${nextBadge.color}`} />
+                      <p className="text-sm font-black text-gray-900 leading-none">{nextBadge.name}</p>
+                    </div>
+                    <div>
                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-orange-400 rounded-full transition-all duration-700" style={{ width: `${badgePct}%` }} />
+                        <div className="h-full bg-violet-500 rounded-full transition-all duration-700" style={{ width: `${badgeProgressPct}%` }} />
                       </div>
                       <p className="text-xs text-gray-400 mt-1">
-                        {nextBadge.threshold - weeklyCount} more to <span className="font-medium">{nextBadge.name}</span>
+                        {nextBadge.tasksRequired - totalCompleted} more tasks · +{nextBadge.bonusCredits} bonus cr
                       </p>
-                    </>
-                  ) : (
-                    <p className="text-xs text-orange-500 font-medium mt-1">All weekly badges earned!</p>
-                  )}
-                </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-2xl font-black text-gray-900 leading-none">All done!</p>
+                    <p className="text-xs text-emerald-500 font-medium">All badges unlocked</p>
+                  </>
+                )}
               </div>
 
               {/* Current Badge */}
-              <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 flex flex-col gap-2">
+              <div className="bg-white rounded-xl border border-gray-100 p-4 flex flex-col gap-2">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-amber-50">
-                    <i className="ri-medal-line text-amber-500 text-xs" />
+                  <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-emerald-50">
+                    <i className="ri-award-line text-emerald-600 text-xs" />
                   </div>
-                  <p className="text-xs text-gray-400 font-medium">Weekly Badge</p>
+                  <p className="text-xs text-gray-400 font-medium">Current Badge</p>
                 </div>
-                {currentBadge ? (
+                {latestBadge ? (
                   <>
-                    <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border ${currentBadge.bg} ${currentBadge.border} w-fit`}>
-                      <i className={`${currentBadge.icon} text-sm ${currentBadge.color}`} />
-                      <span className={`text-sm font-bold ${currentBadge.color}`}>{currentBadge.name}</span>
+                    <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border ${latestBadge.bg} ${latestBadge.border} w-fit`}>
+                      <i className={`${latestBadge.icon} text-sm ${latestBadge.color}`} />
+                      <span className={`text-sm font-bold ${latestBadge.color}`}>{latestBadge.name}</span>
                     </div>
                     <p className="text-xs text-gray-400">
-                      {nextBadge ? `${nextBadge.threshold - weeklyCount} tasks to next badge` : "Top rank this week!"}
+                      {earnedBadges.length} of {BADGE_DEFS.length} badges earned
                     </p>
                   </>
                 ) : (
                   <>
                     <p className="text-2xl font-black text-gray-200 leading-none">—</p>
                     <p className="text-xs text-gray-400">
-                      Complete {nextBadge!.threshold} tasks this week to earn{" "}
-                      <span className="font-medium text-gray-600">{nextBadge!.name}</span>
+                      Complete 1 task to earn your first badge
                     </p>
                   </>
                 )}
               </div>
             </div>
 
-            {/* Weekly goal explainer strip */}
-            <div className="mt-3 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800">
+            {/* Credits explainer strip */}
+            <div className="mt-3 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white border border-gray-100">
               <i className="ri-information-line text-gray-400 text-sm shrink-0" />
               <p className="text-xs text-gray-500">
-                <span className="font-semibold text-gray-700">Weekly Goal:</span> Complete tasks each week to earn badges.
-                Badges reset every Monday — keep the streak alive!
+                <span className="font-semibold text-gray-700">How credits work:</span> Complete any task → earn{" "}
+                <span className="font-semibold text-emerald-600">10 credits</span>. Hit a task milestone → unlock a badge → earn{" "}
+                <span className="font-semibold text-amber-600">bonus credits</span>. Redeem credits for perks.
               </p>
-              <div className="ml-auto flex items-center gap-2 shrink-0">
-                {BADGE_LEVELS.map((b) => (
+              <div className="ml-auto flex items-center gap-1.5 shrink-0 flex-wrap">
+                {BADGE_DEFS.slice(0, 4).map((b) => (
                   <span
-                    key={b.threshold}
+                    key={b.id}
                     className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-medium transition-all ${
-                      weeklyCount >= b.threshold ? `${b.bg} ${b.color} ${b.border}` : "bg-gray-50 text-gray-300 border-gray-100"
+                      totalCompleted >= b.tasksRequired ? `${b.bg} ${b.color} ${b.border}` : "bg-gray-50 text-gray-300 border-gray-100"
                     }`}
                   >
                     <i className={`${b.icon} text-xs`} />
-                    {b.threshold}
+                    {b.tasksRequired}
                   </span>
                 ))}
               </div>
@@ -434,10 +412,10 @@ export default function TaskDashboardPage() {
                 </button>
               ))}
               {nextBadge && (
-                <div className="ml-auto hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-50 border border-orange-200 my-2">
-                  <i className="ri-fire-fill text-orange-500 text-xs" />
-                  <span className="text-xs font-medium text-orange-700">
-                    {nextBadge.threshold - weeklyCount} tasks this week to {nextBadge.name}
+                <div className="ml-auto hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 my-2">
+                  <i className={`${nextBadge.icon} text-amber-500 text-xs`} />
+                  <span className="text-xs font-medium text-amber-700">
+                    {nextBadge.tasksRequired - totalCompleted} tasks to {nextBadge.name} (+{nextBadge.bonusCredits} cr)
                   </span>
                 </div>
               )}
@@ -455,7 +433,7 @@ export default function TaskDashboardPage() {
                 {/* Continue Learning CTA */}
                 {nextTask && (
                   <div
-                    className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-4 cursor-pointer hover:border-gray-200 transition-all group"
+                    className="bg-white rounded-2xl border border-gray-100 p-4 cursor-pointer hover:border-gray-200 transition-all group"
                     onClick={() => setSelectedTask(nextTask)}
                   >
                     <p className="text-xs text-gray-400 font-medium mb-3">Continue where you left off</p>
@@ -470,14 +448,20 @@ export default function TaskDashboardPage() {
                           <MentorTag />
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); setSelectedTask(nextTask); }}
-                        className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${STEP_STYLE[nextTask.color].btn}`}
-                      >
-                        <i className="ri-play-fill text-xs" />
-                        Continue
-                      </button>
+                      <div className="shrink-0 flex items-center gap-2">
+                        <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-full whitespace-nowrap">
+                          <i className="ri-copper-coin-line text-xs" />
+                          +{CREDITS_PER_TASK} cr
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setSelectedTask(nextTask); }}
+                          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${STEP_STYLE[nextTask.color].btn}`}
+                        >
+                          <i className="ri-play-fill text-xs" />
+                          Continue
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -488,7 +472,9 @@ export default function TaskDashboardPage() {
                     <div className="flex items-center gap-2">
                       <i className="ri-focus-3-line text-violet-500 text-sm" />
                       <h2 className="font-bold text-gray-900 text-sm">Today&apos;s Priority Tasks</h2>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-violet-50 text-violet-600 border border-violet-200 font-medium">This Week</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 font-medium">
+                        +{CREDITS_PER_TASK} cr each
+                      </span>
                     </div>
                     <button type="button" onClick={() => setActiveTab("tasks")} className="text-xs text-gray-400 hover:text-gray-600 transition-colors cursor-pointer whitespace-nowrap">
                       View all →
@@ -496,7 +482,7 @@ export default function TaskDashboardPage() {
                   </div>
                   <div className="flex flex-col gap-3">
                     {priorityTasks.length === 0 ? (
-                      <div className="flex flex-col items-center py-10 gap-2 bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800">
+                      <div className="flex flex-col items-center py-10 gap-2 bg-white rounded-2xl border border-gray-100">
                         <div className="w-12 h-12 flex items-center justify-center rounded-full bg-emerald-100">
                           <i className="ri-check-double-line text-emerald-600 text-xl" />
                         </div>
@@ -510,7 +496,7 @@ export default function TaskDashboardPage() {
                         return (
                           <div
                             key={task.id}
-                            className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-4 hover:border-gray-200 transition-all cursor-pointer group"
+                            className="bg-white rounded-2xl border border-gray-100 p-4 hover:border-gray-200 transition-all cursor-pointer group"
                             onClick={() => setSelectedTask(task)}
                           >
                             <div className="flex items-start gap-3">
@@ -533,13 +519,19 @@ export default function TaskDashboardPage() {
                                   </div>
                                 )}
                               </div>
-                              <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); setSelectedTask(task); }}
-                                className={`shrink-0 px-3 py-1.5 rounded-lg text-white text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${style.btn}`}
-                              >
-                                {subsDone > 0 ? "Continue" : "Start"}
-                              </button>
+                              <div className="shrink-0 flex flex-col items-end gap-1.5">
+                                <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                  <i className="ri-copper-coin-line text-[10px]" />
+                                  +{CREDITS_PER_TASK} cr
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.stopPropagation(); setSelectedTask(task); }}
+                                  className={`px-3 py-1.5 rounded-lg text-white text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${style.btn}`}
+                                >
+                                  {subsDone > 0 ? "Continue" : "Start"}
+                                </button>
+                              </div>
                             </div>
                           </div>
                         );
@@ -553,7 +545,7 @@ export default function TaskDashboardPage() {
               {/* Right column */}
               <div className="flex flex-col gap-5">
                 {/* Recent Progress */}
-                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5">
+                <div className="bg-white rounded-2xl border border-gray-100 p-5">
                   <div className="flex items-center gap-2 mb-4">
                     <i className="ri-history-line text-emerald-500 text-base" />
                     <h2 className="font-bold text-gray-900 text-sm">Recent Progress</h2>
@@ -576,6 +568,9 @@ export default function TaskDashboardPage() {
                               <p className="text-xs text-gray-700 leading-snug font-medium">{task.title}</p>
                               <p className={`text-xs font-medium mt-0.5 ${style.text}`}>{task.stepLabel}</p>
                             </div>
+                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200 whitespace-nowrap shrink-0">
+                              +{CREDITS_PER_TASK}
+                            </span>
                           </div>
                         );
                       })}
@@ -595,7 +590,7 @@ export default function TaskDashboardPage() {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5">
+                <div className="bg-white rounded-2xl border border-gray-100 p-5">
                   <div className="flex items-center gap-2 mb-4">
                     <i className="ri-flashlight-line text-amber-500 text-base" />
                     <h2 className="font-bold text-gray-900 text-sm">Quick Actions</h2>
@@ -611,47 +606,130 @@ export default function TaskDashboardPage() {
                       </div>
                       <i className="ri-arrow-right-s-line text-violet-400 ml-auto" />
                     </button>
-                    <button type="button" onClick={() => navigate("/resources")} className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 transition-all cursor-pointer text-left">
-                      <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-600 shrink-0">
+                    <button type="button" onClick={() => navigate("/resources")} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all cursor-pointer text-left">
+                      <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-violet-600 shrink-0">
                         <i className="ri-archive-drawer-fill text-white text-sm" />
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-emerald-800">Resource Vault</p>
-                        <p className="text-xs text-emerald-500">Links &amp; docs</p>
+                        <p className="text-xs font-semibold text-gray-800">Resource Vault</p>
+                        <p className="text-xs text-gray-500">Links &amp; docs</p>
                       </div>
-                      <i className="ri-arrow-right-s-line text-emerald-400 ml-auto" />
+                      <i className="ri-arrow-right-s-line text-gray-400 ml-auto" />
                     </button>
-                    <button type="button" onClick={() => navigate("/session-dashboard")} className="flex items-center gap-3 p-3 rounded-xl bg-amber-50 hover:bg-amber-100 transition-all cursor-pointer text-left">
-                      <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-amber-500 shrink-0">
+                    <button type="button" onClick={() => navigate("/session-dashboard")} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all cursor-pointer text-left">
+                      <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-violet-600 shrink-0">
                         <i className="ri-calendar-event-fill text-white text-sm" />
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-amber-800">Next Session</p>
-                        <p className="text-xs text-amber-500">Apr 14 · 10:00 AM</p>
+                        <p className="text-xs font-semibold text-gray-800">Next Session</p>
+                        <p className="text-xs text-gray-500">Apr 14 · 10:00 AM</p>
                       </div>
-                      <i className="ri-arrow-right-s-line text-amber-400 ml-auto" />
+                      <i className="ri-arrow-right-s-line text-gray-400 ml-auto" />
                     </button>
                   </div>
                 </div>
 
-                {/* Earned Badges this week */}
-                {BADGE_LEVELS.filter((b) => weeklyCount >= b.threshold).length > 0 && (
-                  <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5">
+                {/* Earned Badges */}
+                {earnedBadges.length > 0 && (
+                  <div className="bg-white rounded-2xl border border-gray-100 p-5">
                     <div className="flex items-center gap-2 mb-3">
                       <i className="ri-award-line text-amber-500 text-base" />
-                      <h2 className="font-bold text-gray-900 text-sm">This Week&apos;s Badges</h2>
+                      <h2 className="font-bold text-gray-900 text-sm">Badges Earned</h2>
+                      <span className="ml-auto text-xs text-gray-400">{earnedBadges.length}/{BADGE_DEFS.length}</span>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      {BADGE_LEVELS.filter((b) => weeklyCount >= b.threshold).map((badge) => (
-                        <span key={badge.threshold} className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-medium ${badge.bg} ${badge.color} ${badge.border}`}>
+                      {earnedBadges.map((badge) => (
+                        <span key={badge.id} className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-medium ${badge.bg} ${badge.color} ${badge.border}`}>
                           <i className={`${badge.icon} text-sm`} />
                           {badge.name}
-                          <span className="ml-auto text-[10px] opacity-60">{badge.threshold} tasks</span>
+                          <span className="ml-auto text-[10px] opacity-60">{badge.tasksRequired} tasks · +{badge.bonusCredits} cr</span>
                         </span>
                       ))}
                     </div>
                   </div>
                 )}
+
+                {/* Achievements & Rewards teaser */}
+                <div
+                  className="relative rounded-2xl overflow-hidden cursor-pointer group border border-violet-100"
+                  style={{ background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 45%, #ecfdf5 100%)" }}
+                  onClick={() => navigate("/achievements")}
+                >
+                  {/* Decorative blobs */}
+                  <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full opacity-25 pointer-events-none"
+                    style={{ background: "radial-gradient(circle, #c4b5fd 0%, transparent 70%)" }} />
+                  <div className="absolute -bottom-8 -left-4 w-28 h-28 rounded-full opacity-20 pointer-events-none"
+                    style={{ background: "radial-gradient(circle, #6ee7b7 0%, transparent 70%)" }} />
+
+                  <div className="relative z-10 p-5">
+                    {/* Header row */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-violet-100">
+                          <i className="ri-trophy-fill text-violet-600 text-base" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-violet-700 leading-tight">Rewards &amp; Badges</p>
+                          <p className="text-[10px] text-violet-400">Complete tasks → earn credits → unlock badges</p>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 whitespace-nowrap">
+                        Active
+                      </span>
+                    </div>
+
+                    {/* Credits balance */}
+                    <div className="bg-white/60 rounded-xl px-3 py-2.5 mb-3">
+                      <p className="text-[10px] text-violet-600 font-bold uppercase tracking-wide mb-0.5">Credits Balance</p>
+                      <div className="flex items-end gap-1.5 mb-1">
+                        <span className="text-3xl font-black text-gray-900 leading-none">{totalCredits}</span>
+                        <span className="text-xs text-gray-400 pb-0.5">credits</span>
+                      </div>
+                      <p className="text-[10px] text-gray-500">
+                        {totalCompleted} tasks × {CREDITS_PER_TASK} = {totalCompleted * CREDITS_PER_TASK}
+                        {earnedBadges.length > 0 && ` + ${totalCredits - totalCompleted * CREDITS_PER_TASK} badge bonus`}
+                      </p>
+                    </div>
+
+                    {/* Progress to next badge */}
+                    {nextBadge && (
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] text-gray-500">Next: {nextBadge.name} ({nextBadge.tasksRequired} tasks)</span>
+                          <span className="text-[10px] font-bold text-violet-600">{badgeProgressPct}%</span>
+                        </div>
+                        <div className="h-1.5 bg-white/60 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full"
+                            style={{ width: `${badgeProgressPct}%`, background: "linear-gradient(90deg, #7c3aed, #10b981)" }} />
+                        </div>
+                        <p className="text-[10px] text-gray-400 mt-1">
+                          {nextBadge.tasksRequired - totalCompleted} more tasks · +{nextBadge.bonusCredits} bonus credits on unlock
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Badge pills */}
+                    <div className="flex items-center gap-1.5 flex-wrap mb-4">
+                      <span className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-semibold">
+                        <i className="ri-medal-fill text-[10px]" />
+                        {earnedBadges.length} badge{earnedBadges.length !== 1 ? "s" : ""} earned
+                      </span>
+                      <span className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 font-semibold">
+                        <i className="ri-gift-fill text-[10px]" />
+                        Redeem perks
+                      </span>
+                    </div>
+
+                    {/* CTA */}
+                    <div className="flex items-center justify-between pt-3 border-t border-violet-100">
+                      <span className="text-xs text-gray-400">View badges, history &amp; redeem</span>
+                      <div className="flex items-center gap-1 text-xs text-violet-600 font-bold group-hover:gap-2 transition-all">
+                        Open
+                        <i className="ri-arrow-right-s-line text-sm" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -659,9 +737,8 @@ export default function TaskDashboardPage() {
           {/* ══ TAB: ALL TASKS ═════════════════════════════════════════════ */}
           {activeTab === "tasks" && (
             <div className="flex flex-col gap-8">
-              {/* Empty state — shown when no tasks exist */}
               {tasks.length === 0 && (
-                <div className="flex flex-col items-center py-20 gap-4 bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800">
+                <div className="flex flex-col items-center py-20 gap-4 bg-white rounded-2xl border border-gray-100">
                   <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gray-100">
                     <i className="ri-task-line text-gray-300 text-3xl" />
                   </div>
@@ -710,7 +787,7 @@ export default function TaskDashboardPage() {
                         return (
                           <div
                             key={task.id}
-                            className={`bg-white dark:bg-zinc-900 rounded-2xl border p-5 flex flex-col gap-3 cursor-pointer hover:border-gray-200 transition-all group ${task.done ? "opacity-70" : "border-gray-100"}`}
+                            className={`bg-white rounded-2xl border p-5 flex flex-col gap-3 cursor-pointer hover:border-gray-200 transition-all group ${task.done ? "opacity-70" : "border-gray-100"}`}
                             onClick={() => setSelectedTask(task)}
                           >
                             {/* Card top */}
@@ -719,11 +796,16 @@ export default function TaskDashboardPage() {
                                 <i className={`${task.resourceIcon} ${s.iconText} text-lg`} />
                               </div>
                               {task.done ? (
-                                <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
-                                  <i className="ri-check-line text-white text-xs" />
+                                <div className="flex items-center gap-1.5">
+                                  <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                                    <i className="ri-check-line text-white text-xs" />
+                                  </div>
                                 </div>
                               ) : (
-                                <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${s.badge} whitespace-nowrap`}>{task.stepLabel}</span>
+                                <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                  <i className="ri-copper-coin-line text-[10px]" />
+                                  +{CREDITS_PER_TASK} cr
+                                </span>
                               )}
                             </div>
 

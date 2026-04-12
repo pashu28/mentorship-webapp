@@ -2,7 +2,7 @@ export default function AccountInfo() {
   return (
     <div className="space-y-6">
       {/* Avatar + name */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-6">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6">
         <div className="flex items-center gap-5">
           <div className="w-16 h-16 flex items-center justify-center rounded-full bg-violet-600 text-white text-2xl font-bold shrink-0">
             A
@@ -19,7 +19,7 @@ export default function AccountInfo() {
       </div>
 
       {/* Info grid */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-6 space-y-5">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
         <h3 className="text-sm font-semibold text-gray-900">Personal Information</h3>
         <div className="grid grid-cols-2 gap-x-8 gap-y-5">
           {[
@@ -50,7 +50,7 @@ export default function AccountInfo() {
           { label: "Tasks Finished",     value: "34", icon: "ri-checkbox-circle-line", color: "text-emerald-600 bg-emerald-50" },
           { label: "Mentors Connected",  value: "3",  icon: "ri-user-heart-line", color: "text-amber-600 bg-amber-50" },
         ].map((s) => (
-          <div key={s.label} className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-5 flex items-center gap-4">
+          <div key={s.label} className="bg-white border border-gray-100 rounded-2xl p-5 flex items-center gap-4">
             <div className={`w-10 h-10 flex items-center justify-center rounded-xl ${s.color} shrink-0`}>
               <i className={`${s.icon} text-lg`} />
             </div>

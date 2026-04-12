@@ -2,15 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  html {
-    @apply antialiased text-gray-900 bg-[#F8F8FA];
-  }
-  html.dark {
-    @apply text-zinc-100 bg-zinc-950;
-  }
-}
-
 @keyframes slide-up {
   from { transform: translateY(100%); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }

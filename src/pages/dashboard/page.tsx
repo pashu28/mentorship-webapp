@@ -7,25 +7,29 @@ import TaskCompleteEffect from "./TaskCompleteEffect";
 import MilestoneBadge from "./MilestoneBadge";
 import AppLayout from "@/components/feature/AppLayout";
 
-// Badge system: 5 → Week Warrior, 7 → Momentum, 10+ → Champion
+// Badge system — badges unlock based on total tasks completed
 const BADGE_LEVELS = [
-  { threshold: 5,  name: "Week Warrior", icon: "ri-star-fill",    color: "text-amber-500",   bg: "bg-amber-50",   border: "border-amber-200" },
-  { threshold: 7,  name: "Momentum",     icon: "ri-rocket-2-fill", color: "text-violet-500",  bg: "bg-violet-50",  border: "border-violet-200" },
-  { threshold: 10, name: "Champion",     icon: "ri-trophy-fill",   color: "text-emerald-500", bg: "bg-emerald-50", border: "border-emerald-200" },
+  { threshold: 1,   name: "First Step",    icon: "ri-footprint-fill",   color: "text-violet-500",  bg: "bg-violet-50",  border: "border-violet-200" },
+  { threshold: 5,   name: "Rising Star",   icon: "ri-star-fill",        color: "text-violet-600",  bg: "bg-violet-50",  border: "border-violet-200" },
+  { threshold: 10,  name: "Task Veteran",  icon: "ri-shield-star-fill", color: "text-violet-600",  bg: "bg-violet-50",  border: "border-violet-200" },
+  { threshold: 25,  name: "Gold Achiever", icon: "ri-medal-fill",       color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200" },
+  { threshold: 50,  name: "Champion",      icon: "ri-trophy-fill",      color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200" },
 ];
 
-function getCurrentBadge(streak: number) {
-  return [...BADGE_LEVELS].reverse().find((b) => streak >= b.threshold) ?? null;
+const CREDITS_PER_TASK = 10;
+
+function getCurrentBadge(tasksCompleted: number) {
+  return [...BADGE_LEVELS].reverse().find((b) => tasksCompleted >= b.threshold) ?? null;
 }
 
-function getNextBadge(streak: number) {
-  return BADGE_LEVELS.find((b) => streak < b.threshold) ?? null;
+function getNextBadge(tasksCompleted: number) {
+  return BADGE_LEVELS.find((b) => tasksCompleted < b.threshold) ?? null;
 }
 
 const ringColors = [
   { color: "stroke-violet-600", bg: "stroke-violet-200" },
-  { color: "stroke-emerald-600", bg: "stroke-emerald-200" },
-  { color: "stroke-amber-500",  bg: "stroke-amber-200"  },
+  { color: "stroke-violet-400", bg: "stroke-violet-100" },
+  { color: "stroke-violet-300", bg: "stroke-violet-100" },
 ];
 
 const BASE_RING_PERCENTAGES = goalRings.map((r) => r.percentage);
@@ -51,7 +55,6 @@ const recentCompleted = [
   { id: "rc3", text: "Watch Google UX Certificate Module 1",                   date: "Apr 5" },
 ];
 
-const BADGE_THRESHOLDS = [5, 7, 10];
 
 export default function DashboardPage() {
   const [tasks, setTasks] = useState(
@@ -63,7 +66,8 @@ export default function DashboardPage() {
   const [showEffect, setShowEffect] = useState(false);
   const [justCompleted, setJustCompleted] = useState<Set<string>>(new Set());
 
-  const [streakCount, setStreakCount] = useState(4);
+  // Tasks completed count (starts at 12 past tasks)
+  const [totalTasksDone, setTotalTasksDone] = useState(12);
   const [showBadge, setShowBadge] = useState(false);
   const [badgeStreak, setBadgeStreak] = useState(0);
 
@@ -89,9 +93,10 @@ export default function DashboardPage() {
 
       setShowEffect(true);
 
-      setStreakCount((prev) => {
+      setTotalTasksDone((prev) => {
         const next = prev + 1;
-        if (BADGE_THRESHOLDS.includes(next)) {
+        const newBadge = BADGE_LEVELS.find((b) => b.threshold === next);
+        if (newBadge) {
           setBadgeStreak(next);
           setShowBadge(true);
         }
@@ -109,7 +114,7 @@ export default function DashboardPage() {
 
   const pending = tasks.filter((t) => !t.done);
   const done    = tasks.filter((t) => t.done);
-  const earnedBadges = BADGE_LEVELS.filter((b) => streakCount >= b.threshold);
+  const earnedBadges = BADGE_LEVELS.filter((b) => totalTasksDone >= b.threshold);
 
   return (
     <AppLayout>
@@ -181,64 +186,68 @@ export default function DashboardPage() {
           {/* Left col: Streak + Focus Path */}
           <div className="lg:col-span-2 flex flex-col gap-5">
 
-            {/* Task Streak */}
+            {/* Credits & Progress */}
             {(() => {
-              const currentBadge = getCurrentBadge(streakCount);
-              const nextBadge = getNextBadge(streakCount);
+              const currentBadge = getCurrentBadge(totalTasksDone);
+              const nextBadge = getNextBadge(totalTasksDone);
               const prevThreshold = currentBadge ? currentBadge.threshold : 0;
-              const nextThreshold = nextBadge ? nextBadge.threshold : streakCount;
+              const nextThreshold = nextBadge ? nextBadge.threshold : totalTasksDone;
               const pct = nextBadge
-                ? Math.round(((streakCount - prevThreshold) / (nextThreshold - prevThreshold)) * 100)
+                ? Math.round(((totalTasksDone - prevThreshold) / (nextThreshold - prevThreshold)) * 100)
                 : 100;
+              const totalCredits = totalTasksDone * CREDITS_PER_TASK + 60; // +60 badge bonuses
 
               return (
-                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5">
-                  <div className="flex items-center gap-2 mb-5">
-                    <i className="ri-fire-fill text-orange-500 text-lg" />
-                    <h2 className="font-bold text-gray-900">Task Streak</h2>
+                <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <i className="ri-coin-fill text-violet-500 text-lg" />
+                    <h2 className="font-bold text-gray-900">Credits &amp; Badges</h2>
+                    <button type="button" onClick={() => navigate("/achievements")}
+                      className="ml-auto text-xs text-violet-600 hover:underline cursor-pointer whitespace-nowrap">
+                      View all →
+                    </button>
                   </div>
 
-                  <div className="flex items-end gap-3 mb-5">
-                    <span
-                      className="text-5xl font-black text-gray-900 leading-none transition-all duration-300"
-                      style={{ fontVariantNumeric: "tabular-nums" }}
-                    >
-                      {streakCount}
-                    </span>
-                    <div className="pb-1">
-                      <p className="text-sm font-semibold text-gray-500 leading-tight">tasks</p>
-                      <p className="text-xs text-gray-400 leading-tight">completed</p>
+                  {/* Credits balance */}
+                  <div className="bg-violet-50 rounded-xl px-4 py-3 border border-violet-100 mb-4">
+                    <p className="text-[10px] font-bold text-violet-600 uppercase tracking-wide mb-0.5">Total Credits</p>
+                    <div className="flex items-end gap-1.5 mb-1">
+                      <span className="text-3xl font-black text-gray-900 leading-none">{totalCredits}</span>
+                      <span className="text-xs text-gray-400 pb-0.5">credits</span>
                     </div>
-                    {currentBadge && (
-                      <span className={`ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold ${currentBadge.bg} ${currentBadge.color} ${currentBadge.border}`}>
-                        <i className={currentBadge.icon} />
-                        {currentBadge.name}
-                      </span>
-                    )}
+                    <p className="text-[10px] text-gray-500">
+                      {totalTasksDone} tasks × {CREDITS_PER_TASK} cr = {totalTasksDone * CREDITS_PER_TASK} &nbsp;+&nbsp; badge bonuses = {totalCredits}
+                    </p>
                   </div>
+
+                  {currentBadge && (
+                    <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border mb-3 ${currentBadge.bg} ${currentBadge.border}`}>
+                      <i className={`${currentBadge.icon} ${currentBadge.color} text-sm`} />
+                      <span className={`text-xs font-bold ${currentBadge.color}`}>{currentBadge.name}</span>
+                      <span className="text-xs text-gray-400 ml-1">badge unlocked</span>
+                    </div>
+                  )}
 
                   {nextBadge ? (
                     <div>
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between mb-1.5">
                         <span className="text-xs text-gray-500">
-                          Next: <span className={`font-semibold ${nextBadge.color}`}>{nextBadge.name}</span>
+                          Next badge: <span className={`font-semibold ${nextBadge.color}`}>{nextBadge.name}</span>
                         </span>
-                        <span className="text-xs text-gray-400">{streakCount}/{nextBadge.threshold}</span>
+                        <span className="text-xs text-gray-400">{totalTasksDone}/{nextBadge.threshold} tasks</span>
                       </div>
                       <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-orange-400 rounded-full transition-all duration-700"
-                          style={{ width: `${pct}%` }}
-                        />
+                        <div className="h-full rounded-full transition-all duration-700 bg-violet-500"
+                          style={{ width: `${pct}%` }} />
                       </div>
                       <p className="text-xs text-gray-400 mt-1.5">
-                        {nextBadge.threshold - streakCount} more task{nextBadge.threshold - streakCount !== 1 ? "s" : ""} to unlock {nextBadge.name}
+                        {nextBadge.threshold - totalTasksDone} more task{nextBadge.threshold - totalTasksDone !== 1 ? "s" : ""} to unlock {nextBadge.name}
                       </p>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 bg-emerald-50 rounded-xl px-4 py-3">
                       <i className="ri-trophy-fill text-emerald-500 text-base" />
-                      <p className="text-xs font-semibold text-emerald-700">Champion unlocked — keep the streak going!</p>
+                      <p className="text-xs font-semibold text-emerald-700">All badges unlocked — incredible work!</p>
                     </div>
                   )}
                 </div>
@@ -246,7 +255,7 @@ export default function DashboardPage() {
             })()}
 
             {/* Focus Path */}
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 flex-1">
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 flex-1">
               <div className="flex items-center gap-2 mb-5">
                 <i className="ri-focus-3-line text-violet-500 text-lg" />
                 <h2 className="font-bold text-gray-900">Your Focus Path</h2>
@@ -323,7 +332,7 @@ export default function DashboardPage() {
           {/* Center col: Next Session + Last Session Summary */}
           <div className="lg:col-span-1 flex flex-col gap-5">
             {/* Next Session */}
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5">
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
               <div className="flex items-center gap-2 mb-4">
                 <i className="ri-calendar-event-line text-violet-500 text-lg" />
                 <h2 className="font-bold text-gray-900">Next Session</h2>
@@ -346,12 +355,12 @@ export default function DashboardPage() {
                 <p className="text-sm text-gray-500">10:00 AM · 60 min</p>
               </div>
 
-              <div className="rounded-xl border border-amber-100 bg-amber-50/70 p-3 mb-4">
+              <div className="rounded-xl border border-violet-100 bg-violet-50/70 p-3 mb-4">
                 <div className="flex items-center gap-1.5 mb-2.5">
                   <div className="w-4 h-4 flex items-center justify-center">
-                    <i className="ri-lightbulb-flash-line text-amber-500 text-sm" />
+                    <i className="ri-lightbulb-flash-line text-violet-500 text-sm" />
                   </div>
-                  <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">Prep before session</p>
+                  <p className="text-xs font-semibold text-violet-700 uppercase tracking-wide">Prep before session</p>
                 </div>
                 {pending.length > 0 ? (
                   <div className="flex flex-col gap-2">
@@ -363,19 +372,19 @@ export default function DashboardPage() {
                           className={`w-4 h-4 flex items-center justify-center rounded border-2 bg-white transition-all mt-0.5 shrink-0 cursor-pointer ${
                             justCompleted.has(task.id)
                               ? "border-emerald-400 bg-emerald-400"
-                              : "border-amber-300 hover:border-amber-500"
+                              : "border-violet-300 hover:border-violet-500"
                           }`}
                         >
                           {justCompleted.has(task.id) && (
                             <i className="ri-check-line text-white text-xs" />
                           )}
                         </button>
-                        <p className="text-xs text-amber-900 leading-snug">{task.text}</p>
+                        <p className="text-xs text-violet-900 leading-snug">{task.text}</p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-amber-700 flex items-center gap-1">
+                  <p className="text-xs text-violet-700 flex items-center gap-1">
                     <i className="ri-check-double-line" /> All prep tasks done — you&apos;re ready!
                   </p>
                 )}
@@ -391,9 +400,9 @@ export default function DashboardPage() {
             </div>
 
             {/* Last Session Summary */}
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 flex-1">
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 flex-1">
               <div className="flex items-center gap-2 mb-4">
-                <i className="ri-file-list-3-line text-emerald-500 text-lg" />
+                <i className="ri-file-list-3-line text-violet-500 text-lg" />
                 <h2 className="font-bold text-gray-900">Last Session</h2>
               </div>
               <p className="text-xs text-gray-400 mb-1">Apr 9 · 60 min with Sarah Chen</p>
@@ -408,10 +417,10 @@ export default function DashboardPage() {
               </div>
               <button
                 type="button"
-                onClick={() => navigate("/history")}
+                onClick={() => navigate("/achievements")}
                 className="text-xs text-violet-600 font-medium hover:underline cursor-pointer whitespace-nowrap"
               >
-                View full summary in History →
+                View badges &amp; rewards →
               </button>
             </div>
           </div>
@@ -437,9 +446,9 @@ export default function DashboardPage() {
             </div>
 
             {/* Recent Progress */}
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 flex-1">
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 flex-1">
               <div className="flex items-center gap-2 mb-4">
-                <i className="ri-trophy-line text-amber-500 text-lg" />
+                <i className="ri-trophy-line text-violet-500 text-lg" />
                 <h2 className="font-bold text-gray-900">Recent Progress</h2>
               </div>
               <div className="flex flex-col gap-2 mb-4">
@@ -457,10 +466,10 @@ export default function DashboardPage() {
               </div>
               <button
                 type="button"
-                onClick={() => navigate("/history")}
+                onClick={() => navigate("/achievements")}
                 className="w-full py-2 rounded-xl border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-all cursor-pointer whitespace-nowrap"
               >
-                View full history →
+                View achievements →
               </button>
             </div>
           </div>

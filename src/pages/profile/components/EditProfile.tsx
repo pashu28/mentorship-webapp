@@ -28,7 +28,7 @@ export default function EditProfile() {
   return (
     <div className="space-y-5">
       {/* Avatar */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-6">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6">
         <h3 className="text-sm font-semibold text-gray-900 mb-4">Profile Photo</h3>
         <div className="flex items-center gap-5">
           <div className="w-16 h-16 flex items-center justify-center rounded-full bg-violet-600 text-white text-2xl font-bold shrink-0">
@@ -46,7 +46,7 @@ export default function EditProfile() {
       </div>
 
       {/* Basic info */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-6 space-y-4">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
         <h3 className="text-sm font-semibold text-gray-900">Basic Information</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -121,7 +121,7 @@ export default function EditProfile() {
       </div>
 
       {/* Career info */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-6 space-y-4">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
         <h3 className="text-sm font-semibold text-gray-900">Career &amp; Learning</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -158,7 +158,7 @@ export default function EditProfile() {
       </div>
 
       {/* Social links */}
-      <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-6 space-y-4">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
         <h3 className="text-sm font-semibold text-gray-900">Links &amp; Social</h3>
         <div className="space-y-3">
           {[

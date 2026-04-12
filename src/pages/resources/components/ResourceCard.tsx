@@ -7,19 +7,19 @@ interface ResourceCardProps {
 }
 
 const FORMAT_CONFIG: Record<ResourceFormat, { icon: string; color: string; bg: string }> = {
-  PDF:   { icon: "ri-file-pdf-2-line",   color: "text-red-500",    bg: "bg-red-50" },
-  Doc:   { icon: "ri-file-text-line",    color: "text-emerald-600", bg: "bg-emerald-50" },
-  Link:  { icon: "ri-links-line",        color: "text-violet-500",  bg: "bg-violet-50" },
-  eBook: { icon: "ri-book-open-line",    color: "text-amber-500",   bg: "bg-amber-50" },
-  Video: { icon: "ri-play-circle-line",  color: "text-rose-500",    bg: "bg-rose-50" },
+  PDF:   { icon: "ri-file-pdf-2-line",   color: "text-violet-600", bg: "bg-violet-50" },
+  Doc:   { icon: "ri-file-text-line",    color: "text-violet-600", bg: "bg-violet-50" },
+  Link:  { icon: "ri-links-line",        color: "text-violet-500", bg: "bg-violet-50" },
+  eBook: { icon: "ri-book-open-line",    color: "text-violet-600", bg: "bg-violet-50" },
+  Video: { icon: "ri-play-circle-line",  color: "text-violet-500", bg: "bg-violet-50" },
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Learning:  "bg-violet-100 text-violet-700",
-  Portfolio: "bg-amber-100 text-amber-700",
-  Interview: "bg-emerald-100 text-emerald-700",
-  Research:  "bg-sky-100 text-sky-700",
-  Tools:     "bg-orange-100 text-orange-700",
+  Learning:  "bg-violet-50 text-violet-700 border border-violet-200",
+  Portfolio: "bg-sky-50 text-sky-700 border border-sky-200",
+  Interview: "bg-amber-50 text-amber-700 border border-amber-200",
+  Research:  "bg-teal-50 text-teal-700 border border-teal-200",
+  Tools:     "bg-gray-100 text-gray-600 border border-gray-200",
 };
 
 export default function ResourceCard({ resource, onToggleStar, view }: ResourceCardProps) {
@@ -27,7 +27,7 @@ export default function ResourceCard({ resource, onToggleStar, view }: ResourceC
 
   if (view === "session") {
     return (
-      <div className="flex items-start gap-3 p-4 bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 hover:border-gray-200 transition-all group">
+      <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100 hover:border-gray-200 transition-all group">
         <div className={`w-9 h-9 flex items-center justify-center rounded-lg shrink-0 ${fmt.bg}`}>
           <i className={`${fmt.icon} ${fmt.color} text-base`} />
         </div>
@@ -49,7 +49,7 @@ export default function ResourceCard({ resource, onToggleStar, view }: ResourceC
   }
 
   return (
-    <div className="flex items-start gap-4 px-5 py-4 bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 hover:border-gray-200 transition-all group">
+    <div className="flex items-start gap-4 px-5 py-4 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 transition-all group">
       {/* Format icon */}
       <div className={`w-10 h-10 flex items-center justify-center rounded-xl shrink-0 ${fmt.bg}`}>
         <i className={`${fmt.icon} ${fmt.color} text-lg`} />

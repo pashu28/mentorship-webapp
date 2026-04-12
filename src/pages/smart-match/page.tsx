@@ -8,9 +8,9 @@ export default function SmartMatchPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-zinc-950 flex flex-col">
+    <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800">
+      <nav className="flex items-center justify-between px-8 py-5 bg-white border-b border-gray-100">
         <div className="flex items-center gap-2.5">
           <img src="https://public.readdy.ai/ai/img_res/c1296ba1-3a0e-4b18-b1f8-e3ff105a92d8.png" alt="MentorAI" className="w-8 h-8 object-contain" />
           <span className="font-bold text-gray-900 text-lg">MentorAI</span>
@@ -45,7 +45,7 @@ export default function SmartMatchPage() {
           {mentors.map((mentor, idx) => (
             <div
               key={mentor.id}
-              className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden hover:-translate-y-1 transition-all duration-300 flex flex-col"
+              className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:-translate-y-1 transition-all duration-300 flex flex-col"
               style={{ animationDelay: `${idx * 100}ms` }}
             >
               {/* Match Score Badge */}

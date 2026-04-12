@@ -1,5 +1,11 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+
+interface LocationState {
+  name?: string;
+  occupation?: string;
+  isNew?: boolean;
+}
 
 export default function IntakePage() {
   const [isDragging, setIsDragging] = useState(false);
@@ -9,6 +15,12 @@ export default function IntakePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = (location.state as LocationState) || {};
+  const userName = state.name || "there";
+  const isNew = state.isNew ?? true;
+
+  // ... existing code ...
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -32,11 +44,13 @@ export default function IntakePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-zinc-950 flex flex-col">
+    <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800">
+      <nav className="flex items-center justify-between px-8 py-5 bg-white border-b border-gray-100">
         <div className="flex items-center gap-2.5">
-          <img src="https://public.readdy.ai/ai/img_res/c1296ba1-3a0e-4b18-b1f8-e3ff105a92d8.png" alt="MentorAI" className="w-8 h-8 object-contain" />
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "#7C3AED" }}>
+            <i className="ri-sparkling-2-fill text-white text-sm" />
+          </div>
           <span className="font-bold text-gray-900 text-lg">MentorAI</span>
         </div>
         <div className="flex items-center gap-2">
@@ -50,17 +64,38 @@ export default function IntakePage() {
 
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-16">
         <div className="w-full max-w-2xl">
+
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
-              Let's build your{" "}
-              <span className="bg-gradient-to-r from-violet-600 to-emerald-500 bg-clip-text text-transparent">
-                mentorship profile
-              </span>
-            </h1>
-            <p className="text-gray-500 text-lg">
-              Upload your resume and share your goals — our AI handles the rest.
-            </p>
+            {/* Personalised greeting — hero moment */}
+            {userName ? (
+              <>
+                <h1 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight mb-3">
+                  Hey, {userName}! 👋
+                </h1>
+                <p className="text-lg text-gray-500 mb-1">
+                  Let's build your{" "}
+                  <span className="font-semibold bg-gradient-to-r from-violet-600 to-emerald-500 bg-clip-text text-transparent">
+                    mentorship profile.
+                  </span>
+                </p>
+                <p className="text-sm text-gray-400">
+                  Upload your resume and share your goals — our AI handles the rest.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
+                  Let's build your{" "}
+                  <span className="bg-gradient-to-r from-violet-600 to-emerald-500 bg-clip-text text-transparent">
+                    mentorship profile
+                  </span>
+                </h1>
+                <p className="text-gray-500 text-lg">
+                  Upload your resume and share your goals — our AI handles the rest.
+                </p>
+              </>
+            )}
           </div>
 
           {/* Drop Zone */}

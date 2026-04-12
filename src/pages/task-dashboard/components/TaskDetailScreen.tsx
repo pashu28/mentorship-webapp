@@ -64,7 +64,7 @@ function ResourceCard({ resource }: { resource: TaskResource }) {
       href={`https://${resource.url}`}
       target="_blank"
       rel="nofollow noreferrer"
-      className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-zinc-800 bg-white hover:border-gray-200 transition-all group cursor-pointer"
+      className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-white hover:border-gray-200 transition-all group cursor-pointer"
       onClick={(e) => e.stopPropagation()}
     >
       <div className={`w-8 h-8 rounded-lg ${style.bg} flex items-center justify-center shrink-0`}>

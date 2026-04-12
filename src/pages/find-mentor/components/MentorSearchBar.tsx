@@ -57,7 +57,7 @@ function DropdownSelect({
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-1.5 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-xl shadow-sm z-20 min-w-[180px] py-1 overflow-hidden">
+        <div className="absolute top-full left-0 mt-1.5 bg-white border border-gray-100 rounded-xl shadow-sm z-20 min-w-[180px] py-1 overflow-hidden">
           {options.map((opt) => (
             <button
               key={opt}
