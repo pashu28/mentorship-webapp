@@ -24,7 +24,7 @@ export const aiMatchedMentors = [
     company: "Stripe",
     domain: "Engineering",
     expertise: ["React", "TypeScript", "System Design", "Frontend Architecture"],
-    photo: "https://readdy.ai/api/search-image?query=professional%20headshot%20of%20black%20man%20smiling%20confidently%2C%20soft%20studio%20lighting%2C%20clean%20white%20background%2C%20business%20casual%20attire%2C%20approachable%20expression%2C%20high%20quality%20portrait%20photography&width=400&height=400&seq=mentor2&orientation=squarish",
+    photo: "https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20white%20man%20software%20engineer%20late%2030s%2C%20short%20brown%20hair%20with%20light%20stubble%2C%20warm%20confident%20smile%2C%20soft%20studio%20lighting%2C%20clean%20neutral%20background%2C%20dark%20charcoal%20shirt%2C%20sharp%20focused%20portrait%2C%20high%20quality%20photography&width=400&height=400&seq=marcus-white-headshot-v1&orientation=squarish",
     matchScore: 94,
     matchReasons: ["Specializes in frontend career transitions", "Mentored 20+ career switchers", "Strong system design coaching"],
     bio: "10 years building scalable frontend systems. Passionate about mentoring career switchers into senior engineering roles.",

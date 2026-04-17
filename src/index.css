@@ -2,13 +2,135 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Theme CSS Variables ─────────────────────────────────────────── */
+:root {
+  /* Light theme (default) */
+  --bg-base:        #F5F5F7;
+  --bg-surface:     #FFFFFF;
+  --bg-elevated:    #FAFAFA;
+  --border:         #EBEBEF;
+  --border-subtle:  #F2F2F5;
+  --text-primary:   #111114;
+  --text-secondary: #6B6B7A;
+  --text-muted:     #9999A8;
+  --accent:         #7C3AED;
+  --accent-light:   #F3EEFF;
+  --accent-text:    #6D28D9;
+  --success:        #059669;
+  --success-light:  #ECFDF5;
+  --warning:        #D97706;
+  --warning-light:  #FFFBEB;
+  --danger:         #DC2626;
+  --danger-light:   #FEF2F2;
+}
+
+html.dark {
+  /* ── Dark theme — refined palette ── */
+
+  /* Backgrounds — 4-layer depth system */
+  --bg-base:        #0D0D0F;   /* Page canvas — deep warm-neutral */
+  --bg-surface:     #161618;   /* Cards, sidebar, panels */
+  --bg-elevated:    #1E1E22;   /* Dropdowns, modals, hover states, inputs */
+  --bg-overlay:     #252529;   /* Tooltips, popovers, tag backgrounds */
+
+  /* Borders */
+  --border:         #2A2A2F;   /* Card borders, dividers */
+  --border-subtle:  #222226;   /* Inner section separators */
+
+  /* Typography — 4-step hierarchy */
+  --text-primary:   #F0F0F2;   /* Headings — near-white, easy on eyes */
+  --text-secondary: #C8C8D0;   /* Sub-headings, section titles */
+  --text-body:      #A0A0AE;   /* Body text, descriptions */
+  --text-muted:     #6A6A78;   /* Captions, timestamps, hints */
+  --text-disabled:  #44444E;   /* Disabled states */
+
+  /* Accent — purple stays, brightened for dark bg */
+  --accent:         #7C3AED;   /* Primary purple — buttons, active states */
+  --accent-hover:   #6D28D9;   /* Button hover */
+  --accent-light:   #2A1F45;   /* Accent tint bg — behind accent elements */
+  --accent-text:    #A78BFA;   /* Accent text on dark bg */
+
+  /* Icons */
+  --icon-default:   #8888A0;   /* Default icon color */
+  --icon-active:    #A78BFA;   /* Active/accent icon */
+  --icon-bg:        #1E1E22;   /* Icon container bg */
+  --icon-active-bg: #2A1F45;   /* Active icon container bg */
+
+  /* Status colors — lighter for dark bg readability */
+  --success:        #34D399;
+  --success-light:  #0A2E1E;
+  --warning:        #FBBF24;
+  --warning-light:  #2D1F00;
+  --danger:         #F87171;
+  --danger-light:   #2D0A0A;
+
+  /* Tags */
+  --tag-default-text:   #A0A0AE;
+  --tag-default-bg:     #1E1E22;
+  --tag-default-border: #2A2A2F;
+  --tag-purple-text:    #C4B5FD;
+  --tag-purple-bg:      #2A1F45;
+  --tag-purple-border:  #4C3A8A;
+  --tag-green-text:     #6EE7B7;
+  --tag-green-bg:       #0A2E1E;
+  --tag-green-border:   #1A5C3A;
+  --tag-amber-text:     #FCD34D;
+  --tag-amber-bg:       #2D1F00;
+  --tag-amber-border:   #5C3A00;
+}
+
+/* ─── Smooth theme transition ─────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  transition:
+    background-color 0.25s ease,
+    border-color     0.25s ease,
+    color            0.2s ease,
+    fill             0.2s ease,
+    box-shadow       0.2s ease;
+}
+
+/* Exclude transitions that would feel laggy on interactive elements */
+button,
+a,
+input,
+select,
+textarea {
+  transition:
+    background-color 0.25s ease,
+    border-color     0.25s ease,
+    color            0.2s ease,
+    opacity          0.15s ease,
+    transform        0.15s ease;
+}
+
+/* ─── Theme utility classes ───────────────────────────────────────── */
+.bg-base      { background-color: var(--bg-base); }
+.bg-surface   { background-color: var(--bg-surface); }
+.bg-elevated  { background-color: var(--bg-elevated); }
+.border-theme { border-color: var(--border); }
+.border-subtle { border-color: var(--border-subtle); }
+.text-primary  { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted    { color: var(--text-muted); }
+.accent-bg     { background-color: var(--accent-light); }
+.accent-text   { color: var(--accent-text); }
+
+/* ─── Page animations ─────────────────────────────────────────────── */
 @keyframes slide-up {
   from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(0);    opacity: 1; }
 }
 @keyframes slide-in-right {
   from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(0);    opacity: 1; }
 }
-.animate-slide-up { animation: slide-up 0.35s ease-out; }
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up       { animation: slide-up 0.35s ease-out; }
 .animate-slide-in-right { animation: slide-in-right 0.3s ease-out; }
+.animate-fade-in        { animation: fade-in 0.3s ease-out; }

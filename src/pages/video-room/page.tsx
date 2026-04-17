@@ -1,6 +1,65 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { transcript, resourceVault } from "@/mocks/session";
+
+// Dedicated full-screen video-call images — candid, realistic, landscape
+const VIDEO_CALL_PHOTOS: Record<string, string> = {
+  "Marcus Williams":
+    "https://readdy.ai/api/search-image?query=close%20up%20front%20facing%20video%20call%20portrait%20of%20a%20white%20man%20engineer%20late%2030s%2C%20short%20brown%20hair%20light%20stubble%2C%20looking%20directly%20into%20camera%20with%20a%20relaxed%20confident%20smile%2C%20wearing%20a%20dark%20charcoal%20henley%2C%20face%20and%20upper%20chest%20filling%20the%20frame%2C%20soft%20warm%20natural%20window%20light%20from%20the%20side%2C%20blurred%20bokeh%20bookshelf%20background%20behind%20him%2C%20photorealistic%20zoom%20call%20screenshot%20style%2C%20shallow%20depth%20of%20field%2C%20cinematic%20portrait&width=1200&height=800&seq=marcus-white-vc-v1&orientation=landscape",
+  "Sarah Chen":
+    "https://readdy.ai/api/search-image?query=candid%20video%20call%20of%20an%20asian%20woman%20UX%20designer%20early%2030s%20in%20a%20bright%20creative%20home%20office%2C%20large%20window%20with%20soft%20daylight%20behind%20her%2C%20pastel%20wall%20with%20framed%20design%20prints%2C%20white%20linen%20blouse%2C%20warm%20genuine%20smile%20mid-conversation%2C%20upper%20body%20framing%2C%20shallow%20depth%20of%20field%2C%20photorealistic%20portrait%20lifestyle%20photo&width=1200&height=800&seq=sarah-vc-v2&orientation=landscape",
+  "Priya Sharma":
+    "https://readdy.ai/api/search-image?query=candid%20video%20call%20of%20an%20indian%20woman%20product%20manager%20mid%2030s%2C%20modern%20open-plan%20home%20workspace%2C%20whiteboard%20with%20sticky%20notes%20softly%20visible%20behind%2C%20wearing%20a%20sage%20green%20blazer%2C%20animated%20expression%20as%20if%20explaining%20something%2C%20natural%20daylight%20from%20window%2C%20realistic%20candid%20photo%20feel&width=1200&height=800&seq=priya-vc-v2&orientation=landscape",
+  "James Okafor":
+    "https://readdy.ai/api/search-image?query=candid%20video%20call%20of%20a%20tall%20african%20man%20engineering%20manager%20early%2040s%2C%20home%20office%20with%20neat%20shelving%20unit%20and%20a%20plant%2C%20warm%20evening%20lamp%20light%2C%20wearing%20a%20white%20oxford%20shirt%20open%20collar%2C%20calm%20confident%20gaze%20into%20camera%2C%20upper%20body%20visible%2C%20cinematic%20realism&width=1200&height=800&seq=james-vc-v2&orientation=landscape",
+  "Yuki Tanaka":
+    "https://readdy.ai/api/search-image?query=candid%20video%20call%20of%20a%20japanese%20woman%20data%20scientist%20late%2020s%2C%20minimal%20desk%20setup%20with%20a%20glowing%20monitor%20showing%20charts%2C%20cool%20blue%20evening%20window%20light%2C%20wearing%20a%20loose%20grey%20sweater%2C%20thoughtful%20slight%20smile%2C%20upper%20body%20shot%2C%20photorealistic%20lifestyle&width=1200&height=800&seq=yuki-vc-v2&orientation=landscape",
+  "Carlos Rivera":
+    "https://readdy.ai/api/search-image?query=candid%20video%20call%20of%20a%20hispanic%20man%20growth%20marketer%20early%2030s%2C%20energetic%20colorful%20home%20workspace%20with%20a%20cork%20board%20behind%20him%2C%20bright%20morning%20window%20light%2C%20casual%20shirt%2C%20big%20grin%20mid-sentence%2C%20upper%20body%20and%20hands%20visible%2C%20realistic%20candid%20photo&width=1200&height=800&seq=carlos-vc-v2&orientation=landscape",
+  "Amara Osei":
+    "https://readdy.ai/api/search-image?query=candid%20video%20call%20of%20an%20african%20woman%20UX%20researcher%2030s%2C%20cozy%20warm%20home%20office%20with%20a%20large%20trailing%20plant%20and%20earth-tone%20decor%2C%20soft%20warm%20lighting%2C%20wearing%20a%20terracotta%20blouse%2C%20warm%20friendly%20smile%20looking%20at%20camera%2C%20upper%20body%20composition%2C%20photorealistic&width=1200&height=800&seq=amara-vc-v2&orientation=landscape",
+  "Daniel Park":
+    "https://readdy.ai/api/search-image?query=candid%20video%20call%20of%20a%20korean%20man%20iOS%20engineer%20early%2030s%2C%20ultra-clean%20minimal%20desk%20with%20an%20iMac%20and%20small%20succulent%2C%20cool%20natural%20window%20light%2C%20white%20crewneck%2C%20focused%20relaxed%20expression%20looking%20at%20screen%2C%20cinematic%20shallow%20dof%2C%20realistic%20photo&width=1200&height=800&seq=daniel-vc-v2&orientation=landscape",
+  "Fatima Al-Hassan":
+    "https://readdy.ai/api/search-image?query=candid%20video%20call%20of%20a%20middle%20eastern%20woman%20startup%20founder%20early%2030s%2C%20stylish%20modern%20home%20office%20with%20a%20visible%20whiteboard%20covered%20in%20notes%20and%20a%20mood%20lamp%2C%20wearing%20a%20charcoal%20structured%20blazer%2C%20confident%20and%20animated%20expression%2C%20upper%20body%20shot%2C%20photorealistic%20lifestyle%20photo&width=1200&height=800&seq=fatima-vc-v2&orientation=landscape",
+};
+
+function resolveMentorVideoPhoto(mentorName: string): string {
+  if (VIDEO_CALL_PHOTOS[mentorName]) return VIDEO_CALL_PHOTOS[mentorName];
+  // Generic fallback — gender-neutral candid
+  return "https://readdy.ai/api/search-image?query=candid%20video%20call%20of%20a%20professional%20mentor%20in%20a%20warm%20cozy%20home%20office%20with%20bookshelves%20and%20ambient%20lighting%2C%20upper%20body%20visible%2C%20engaged%20smile%2C%20realistic%20lifestyle%20photo&width=1200&height=800&seq=mentor-vc-generic&orientation=landscape";
+}
+
+interface MentorState {
+  mentorName: string;
+  mentorRole: string;
+  mentorCompany: string;
+  mentorPhoto: string;
+}
+
+function getBookedMentor(): MentorState {
+  try {
+    const raw = localStorage.getItem("mentorAI_bookedMentor");
+    if (raw) {
+      const m = JSON.parse(raw) as {
+        name?: string; mentorName?: string;
+        role?: string; mentorRole?: string;
+        company?: string; mentorCompany?: string;
+        photo?: string; mentorPhoto?: string;
+      };
+      const resolvedName = m.name ?? m.mentorName ?? "";
+      if (resolvedName) {
+        return {
+          mentorName: resolvedName,
+          mentorRole: m.role ?? m.mentorRole ?? "Mentor",
+          mentorCompany: m.company ?? m.mentorCompany ?? "",
+          mentorPhoto: m.photo ?? m.mentorPhoto ?? "",
+        };
+      }
+    }
+  } catch (_) { /* ignore */ }
+  return { mentorName: "Your Mentor", mentorRole: "Mentor", mentorCompany: "", mentorPhoto: "" };
+}
 
 type ChatMessage = {
   id: number;
@@ -24,6 +83,24 @@ function extractUrl(text: string): string | null {
 }
 
 export default function VideoRoomPage() {
+  const location = useLocation();
+  const mentor: MentorState = (location.state as MentorState) || getBookedMentor();
+  const mentorFirstName = mentor.mentorName.split(" ")[0];
+  const mentorVideoPhoto = resolveMentorVideoPhoto(mentor.mentorName);
+
+  // Self camera
+  const selfVideoRef = useRef<HTMLVideoElement>(null);
+  const selfStreamRef = useRef<MediaStream | null>(null);
+
+  // User identity for the PiP fallback
+  const userName = localStorage.getItem("mentorAI_userName") || "You";
+  const userInitials = userName
+    .split(" ")
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [activeTab, setActiveTab] = useState<SideTab>("scribe");
@@ -116,6 +193,43 @@ export default function VideoRoomPage() {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
   }, [chatMessages]);
+
+  // Start camera on mount, stop it on unmount
+  useEffect(() => {
+    let cancelled = false;
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: false })
+      .then((stream) => {
+        if (cancelled) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        selfStreamRef.current = stream;
+        if (selfVideoRef.current) {
+          selfVideoRef.current.srcObject = stream;
+        }
+      })
+      .catch(() => {
+        // No camera or permission denied — PiP stays on initials fallback
+      });
+    return () => {
+      cancelled = true;
+      if (selfStreamRef.current) {
+        selfStreamRef.current.getTracks().forEach((t) => t.stop());
+        selfStreamRef.current = null;
+      }
+    };
+  }, []); // runs once on mount
+
+  // When user toggles video off, pause the stream visually but keep it alive for quick re-enable
+  // (stream stays active so toggling back on is instant — no re-permission needed)
+  useEffect(() => {
+    if (selfStreamRef.current) {
+      selfStreamRef.current.getVideoTracks().forEach((t) => {
+        t.enabled = !isVideoOff;
+      });
+    }
+  }, [isVideoOff]);
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -223,9 +337,9 @@ export default function VideoRoomPage() {
           {/* Mentor video */}
           <div className="absolute inset-0">
             <img
-              src="https://readdy.ai/api/search-image?query=professional%20woman%20mentor%20in%20video%20call%2C%20warm%20home%20office%20background%20with%20bookshelves%2C%20soft%20natural%20lighting%2C%20smiling%20and%20engaged%20in%20conversation%2C%20high%20quality%20realistic%20photo&width=1200&height=800&seq=video-mentor&orientation=landscape"
-              alt="Mentor video"
-              className="w-full h-full object-cover object-top"
+              src={mentorVideoPhoto}
+              alt={`${mentor.mentorName} video`}
+              className="w-full h-full object-cover object-center"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-gray-950/70 via-transparent to-gray-950/20" />
           </div>
@@ -243,7 +357,7 @@ export default function VideoRoomPage() {
 
             {/* Mentor name */}
             <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm rounded-full px-3 py-1.5">
-              <span className="text-white text-xs font-medium">Sarah Chen · UX Design</span>
+              <span className="text-white text-xs font-medium">{mentor.mentorName}{mentor.mentorRole ? ` · ${mentor.mentorRole}` : ""}</span>
             </div>
 
             {/* AI Scribe pill — click to slide panel in/out */}
@@ -268,14 +382,21 @@ export default function VideoRoomPage() {
 
           {/* Self video PiP */}
           <div className="absolute bottom-24 right-4 w-36 h-24 rounded-xl overflow-hidden border-2 border-white/20 z-10">
-            <img
-              src="https://readdy.ai/api/search-image?query=young%20professional%20person%20in%20video%20call%2C%20neutral%20background%2C%20casual%20attire%2C%20looking%20at%20camera%2C%20soft%20lighting%2C%20realistic%20photo&width=300&height=200&seq=self-video&orientation=landscape"
-              alt="Your video"
-              className="w-full h-full object-cover object-top"
+            {/* Live camera feed */}
+            <video
+              ref={selfVideoRef}
+              autoPlay
+              muted
+              playsInline
+              className={`w-full h-full object-cover scale-x-[-1] ${isVideoOff ? "hidden" : "block"}`}
             />
+            {/* Camera off — show initials */}
             {isVideoOff && (
-              <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
-                <i className="ri-user-line text-white text-2xl" />
+              <div className="absolute inset-0 bg-gray-800 flex flex-col items-center justify-center gap-1">
+                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-violet-700 text-white font-bold text-sm">
+                  {userInitials}
+                </div>
+                <span className="text-gray-400 text-xs">Camera off</span>
               </div>
             )}
             <div className="absolute bottom-1.5 left-2">
@@ -452,7 +573,7 @@ export default function VideoRoomPage() {
                     <div key={msg.id} className={`flex flex-col gap-1 ${msg.sender === "you" ? "items-end" : "items-start"}`}>
                       <div className="flex items-center gap-1.5">
                         <span className={`text-xs font-medium ${msg.sender === "mentor" ? "text-violet-400" : "text-emerald-400"}`}>
-                          {msg.sender === "mentor" ? "Sarah" : "You"}
+                          {msg.sender === "mentor" ? mentorFirstName : "You"}
                         </span>
                         <span className="text-gray-600 text-xs">{msg.time}</span>
                       </div>

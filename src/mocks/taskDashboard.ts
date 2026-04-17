@@ -41,7 +41,7 @@ export const mainTasks: MainTask[] = [
   {
     id: "t1",
     title: "Learn Figma Basics",
-    description: "Master Auto Layout and Components — the two most essential Figma skills for building scalable, production-ready designs.",
+    description: "Master Auto Layout and Components - the two most essential Figma skills for building scalable, production-ready designs.",
     stepId: 1,
     stepLabel: "Step 1",
     stepTitle: "Build Your Foundation",
@@ -55,14 +55,14 @@ export const mainTasks: MainTask[] = [
       { id: "t1s5", text: "Build a reusable card component", done: false },
     ],
     resources: [
-      { id: "r1", title: "Figma Auto Layout — Official Docs", url: "figma.com/docs/auto-layout", type: "Article", source: "Figma" },
+      { id: "r1", title: "Figma Auto Layout - Official Docs", url: "figma.com/docs/auto-layout", type: "Article", source: "Figma" },
       { id: "r2", title: "Auto Layout Full Tutorial", url: "youtube.com/watch?v=figma-autolayout", type: "Video", source: "YouTube" },
       { id: "r3", title: "Components & Variants Guide", url: "figma.com/docs/components", type: "PDF", source: "Figma" },
       { id: "r4", title: "Figma Starter Kit", url: "figma.com/community/starter-kit", type: "File", source: "Figma Community" },
     ],
     aiTips: [
-      "Auto Layout in Figma works like CSS Flexbox — elements stack and resize automatically. Start by selecting a frame, then enable Auto Layout from the right panel (or press Shift+A).",
-      "Components are reusable design elements. Create a master component, then use instances throughout your design. Change the master and all instances update instantly — huge time saver!",
+      "Auto Layout in Figma works like CSS Flexbox - elements stack and resize automatically. Start by selecting a frame, then enable Auto Layout from the right panel (or press Shift+A).",
+      "Components are reusable design elements. Create a master component, then use instances throughout your design. Change the master and all instances update instantly - huge time saver!",
     ],
     verificationQuestions: [
       {
@@ -74,7 +74,7 @@ export const mainTasks: MainTask[] = [
           "Manage color styles",
         ],
         correct: 1,
-        explanation: "Auto Layout creates frames that automatically resize when content changes — just like CSS Flexbox. It's one of Figma's most powerful features for building responsive components.",
+        explanation: "Auto Layout creates frames that automatically resize when content changes - just like CSS Flexbox. It's one of Figma's most powerful features for building responsive components.",
       },
       {
         question: "Which of these is a key benefit of using Components in Figma?",
@@ -85,7 +85,7 @@ export const mainTasks: MainTask[] = [
           "They replace the need for Auto Layout",
         ],
         correct: 1,
-        explanation: "Components let you create a master element and reuse it across your design. Update the master and all instances update automatically — huge time saver!",
+        explanation: "Components let you create a master element and reuse it across your design. Update the master and all instances update automatically - huge time saver!",
       },
     ],
     done: false,
@@ -93,7 +93,7 @@ export const mainTasks: MainTask[] = [
   {
     id: "t2",
     title: "Improve Resume Writing",
-    description: "Learn how to write a compelling UX case study that showcases your process, not just your final designs — the way recruiters actually want to see it.",
+    description: "Learn how to write a compelling UX case study that showcases your process, not just your final designs - the way recruiters actually want to see it.",
     stepId: 1,
     stepLabel: "Step 1",
     stepTitle: "Build Your Foundation",
@@ -106,13 +106,13 @@ export const mainTasks: MainTask[] = [
       { id: "t2s4", text: "Take notes on key structure points", done: false },
     ],
     resources: [
-      { id: "r1", title: "UX Case Study Structure — NNGroup", url: "nngroup.com/articles/ux-case-study", type: "Article", source: "NNGroup" },
+      { id: "r1", title: "UX Case Study Structure - NNGroup", url: "nngroup.com/articles/ux-case-study", type: "Article", source: "NNGroup" },
       { id: "r2", title: "Case Study Template Download", url: "nngroup.com/templates/case-study", type: "PDF", source: "NNGroup" },
       { id: "r3", title: "Portfolio Review Checklist", url: "uxdesign.cc/portfolio-checklist", type: "Link", source: "UX Design" },
     ],
     aiTips: [
       "NNGroup case studies follow a clear structure: Problem → Research → Process → Solution → Outcomes. The key is showing your thinking, not just the final design.",
-      "Your 34% drop-off stat is gold — lead with it in your problem statement. Data-backed problem statements immediately grab recruiter attention.",
+      "Your 34% drop-off stat is gold - lead with it in your problem statement. Data-backed problem statements immediately grab recruiter attention.",
     ],
     verificationQuestions: [
       {
@@ -124,7 +124,7 @@ export const mainTasks: MainTask[] = [
           "The number of screens designed",
         ],
         correct: 1,
-        explanation: "NNGroup emphasizes that recruiters care most about HOW you think and solve problems — your process, research, and decision-making — not just the final visuals.",
+        explanation: "NNGroup emphasizes that recruiters care most about HOW you think and solve problems - your process, research, and decision-making - not just the final visuals.",
       },
     ],
     done: false,
@@ -132,7 +132,7 @@ export const mainTasks: MainTask[] = [
   {
     id: "t3",
     title: "Understand UX Research Methods",
-    description: "Get a structured foundation in UX design through Google's industry-recognized certificate program — free to audit on Coursera.",
+    description: "Get a structured foundation in UX design through Google's industry-recognized certificate program - free to audit on Coursera.",
     stepId: 1,
     stepLabel: "Step 1",
     stepTitle: "Build Your Foundation",
@@ -150,8 +150,8 @@ export const mainTasks: MainTask[] = [
       { id: "r3", title: "UX Design Glossary", url: "uxdesign.cc/glossary", type: "Article", source: "UX Design" },
     ],
     aiTips: [
-      "Module 1 covers the fundamentals — what UX design is, the design process, and the role of a UX designer. It sets the foundation for everything that follows.",
-      "The certificate is free to audit on Coursera. Focus on the quizzes and assignments — they reinforce the concepts much better than just watching videos.",
+      "Module 1 covers the fundamentals - what UX design is, the design process, and the role of a UX designer. It sets the foundation for everything that follows.",
+      "The certificate is free to audit on Coursera. Focus on the quizzes and assignments - they reinforce the concepts much better than just watching videos.",
     ],
     verificationQuestions: [
       {
@@ -163,7 +163,7 @@ export const mainTasks: MainTask[] = [
           "Conducting usability tests",
         ],
         correct: 1,
-        explanation: "Module 1 covers the fundamentals — what UX design is, the design process, and the role of a UX designer. It sets the foundation for everything that follows.",
+        explanation: "Module 1 covers the fundamentals - what UX design is, the design process, and the role of a UX designer. It sets the foundation for everything that follows.",
       },
     ],
     done: false,
@@ -171,7 +171,7 @@ export const mainTasks: MainTask[] = [
   {
     id: "t4",
     title: "Write Your Problem Statement",
-    description: "Craft a clear, data-backed problem statement for your onboarding redesign project — the foundation of every strong UX case study.",
+    description: "Craft a clear, data-backed problem statement for your onboarding redesign project - the foundation of every strong UX case study.",
     stepId: 2,
     stepLabel: "Step 2",
     stepTitle: "Document Your Work",
@@ -190,7 +190,7 @@ export const mainTasks: MainTask[] = [
     ],
     aiTips: [
       "Your problem statement formula: '[User type] needs [need] because [insight/data].' Example: 'New users need a clearer onboarding flow because 34% drop off before completing setup.'",
-      "Keep it to 2-3 sentences max. Recruiters skim — make every word count.",
+      "Keep it to 2-3 sentences max. Recruiters skim - make every word count.",
     ],
     verificationQuestions: [
       {
@@ -404,7 +404,7 @@ export const mainTasks: MainTask[] = [
 ];
 
 export const goalRingsData = [
-  { id: 1, label: "UX Foundations", stepId: 1, color: "stroke-violet-600", bg: "stroke-violet-200" },
-  { id: 2, label: "Portfolio", stepId: 2, color: "stroke-emerald-600", bg: "stroke-emerald-200" },
-  { id: 3, label: "Networking", stepId: 3, color: "stroke-amber-500", bg: "stroke-amber-200" },
+  { id: 1, label: "UX Foundations", stepId: 1, color: "stroke-violet-600", bg: "stroke-violet-200", darkColor: "#8B5CF6", darkBg: "rgba(139,92,246,0.18)" },
+  { id: 2, label: "Portfolio", stepId: 2, color: "stroke-emerald-600", bg: "stroke-emerald-200", darkColor: "#34D399", darkBg: "rgba(52,211,153,0.15)" },
+  { id: 3, label: "Networking", stepId: 3, color: "stroke-amber-500", bg: "stroke-amber-200", darkColor: "#FBBF24", darkBg: "rgba(251,191,36,0.15)" },
 ];

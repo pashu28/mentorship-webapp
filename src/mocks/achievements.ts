@@ -227,16 +227,15 @@ export const redemptionOptions: RedemptionOption[] = [
 ];
 
 // ── Summary stats ──────────────────────────────────────────────────────────
-// totalCredits = (tasks × 10) + badge bonuses
-// 12 tasks × 10 = 120  +  badge bonuses (10+20+30) = 60  →  total = 180
+// Starts at zero — all values are earned by the mentee in real-time.
 
 export const achievementStats = {
-  totalTasksCompleted: 12,
-  creditsFromTasks: 120,      // 12 × 10
-  creditsFromBadges: 60,      // 10 + 20 + 30
-  totalCreditsEarned: 180,    // 120 + 60
+  totalTasksCompleted: 0,
+  creditsFromTasks: 0,
+  creditsFromBadges: 0,
+  totalCreditsEarned: 0,
   totalCreditsRedeemed: 0,
-  totalBadgesEarned: 3,
-  nextBadge: "gold-achiever",
-  tasksToNextBadge: 13,       // 25 - 12 = 13 more tasks needed
+  totalBadgesEarned: 0,
+  nextBadge: "first-step",
+  tasksToNextBadge: 1,
 };

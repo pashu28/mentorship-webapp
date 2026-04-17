@@ -207,11 +207,9 @@ export default function TaskDetailPanel({
   onClose,
 }: TaskDetailPanelProps) {
   const [flowStep, setFlowStep] = useState<FlowStep>("subtasks");
-  const [learnStep, setLearnStep] = useState(0);
   const [quizIdx, setQuizIdx] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [answeredCorrect, setAnsweredCorrect] = useState<boolean | null>(null);
-  const [quizPassed, setQuizPassed] = useState(false);
   const [tutorInput, setTutorInput] = useState("");
   const [tutorMessages, setTutorMessages] = useState<{ role: "user" | "ai"; text: string }[]>([]);
   const [tutorTyping, setTutorTyping] = useState(false);
@@ -223,7 +221,6 @@ export default function TaskDetailPanel({
   const doneSubs = subTasks.filter((s) => s.done).length;
   const allSubsDone = doneSubs === subTasks.length;
 
-  // Pre-load AI tips as chat messages when entering AI Tutor tab
   useEffect(() => {
     if (flowStep === "learn" && tutorMessages.length === 0) {
       const initialMessages: { role: "user" | "ai"; text: string }[] = explanations.map((exp) => ({
@@ -231,7 +228,6 @@ export default function TaskDetailPanel({
         text: exp,
       }));
       setTutorMessages(initialMessages);
-      setLearnStep(explanations.length - 1);
     }
   }, [flowStep]);
 
@@ -249,9 +245,6 @@ export default function TaskDetailPanel({
     const q = questions[quizIdx];
     const correct = idx === q.correct;
     setAnsweredCorrect(correct);
-    if (correct && quizIdx === questions.length - 1) {
-      setQuizPassed(true);
-    }
   };
 
   const handleNextQuestion = () => {
@@ -277,62 +270,90 @@ export default function TaskDetailPanel({
     }, 1000);
   };
 
-  const dotColor = stepColor === "violet" ? "bg-violet-500" : stepColor === "emerald" ? "bg-emerald-500" : "bg-amber-500";
-  const accentText = stepColor === "violet" ? "text-violet-600" : stepColor === "emerald" ? "text-emerald-600" : "text-amber-600";
-  const accentBg = stepColor === "violet" ? "bg-violet-50" : stepColor === "emerald" ? "bg-emerald-50" : "bg-amber-50";
-  const accentBorder = stepColor === "violet" ? "border-violet-200" : stepColor === "emerald" ? "border-emerald-200" : "border-amber-200";
-  const accentBtn = stepColor === "violet" ? "bg-violet-600 hover:bg-violet-700" : stepColor === "emerald" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-amber-500 hover:bg-amber-600";
+  const accentBtn =
+    stepColor === "violet"
+      ? "bg-violet-600 hover:bg-violet-700"
+      : stepColor === "emerald"
+      ? "bg-emerald-600 hover:bg-emerald-700"
+      : "bg-amber-500 hover:bg-amber-600";
+
+  const barColor =
+    stepColor === "violet"
+      ? "bg-violet-500"
+      : stepColor === "emerald"
+      ? "bg-emerald-500"
+      : "bg-amber-500";
+
+  const FLOW_TABS: { id: FlowStep; label: string; icon: string }[] = [
+    { id: "subtasks", label: "Sub-tasks", icon: "ri-list-check-2" },
+    { id: "learn", label: "AI Tutor", icon: "ri-sparkling-2-fill" },
+    { id: "quiz", label: "Verify", icon: "ri-question-answer-line" },
+    { id: "complete", label: "Complete", icon: "ri-checkbox-circle-line" },
+  ];
+
+  const stepOrder: FlowStep[] = ["subtasks", "learn", "quiz", "complete"];
+  const currentIdx = stepOrder.indexOf(flowStep);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
       <div
         ref={panelRef}
-        className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-        style={{ boxShadow: "0 24px 64px rgba(0,0,0,0.12)" }}
+        className="rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        style={{ backgroundColor: "var(--bg-surface)", boxShadow: "0 24px 64px rgba(0,0,0,0.4)" }}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-start gap-3 z-10">
-          <div className={`w-2.5 h-2.5 rounded-full ${dotColor} mt-1.5 shrink-0`} />
+        <div
+          className="sticky top-0 z-10 border-b px-6 py-4 flex items-start gap-3"
+          style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}
+        >
+          <div
+            className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0"
+            style={{
+              backgroundColor:
+                stepColor === "violet" ? "#7c3aed" : stepColor === "emerald" ? "#10b981" : "#f59e0b",
+            }}
+          />
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-gray-400 font-medium">{stepTitle}</p>
-            <h2 className="text-base font-bold text-gray-900 leading-snug mt-0.5">{taskText}</h2>
+            <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{stepTitle}</p>
+            <h2 className="text-base font-bold leading-snug mt-0.5" style={{ color: "var(--text-primary)" }}>{taskText}</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all cursor-pointer shrink-0"
+            className="w-8 h-8 flex items-center justify-center rounded-full transition-all cursor-pointer shrink-0"
+            style={{ color: "var(--text-muted)" }}
           >
             <i className="ri-close-line text-lg" />
           </button>
         </div>
 
-        {/* Flow step tabs */}
-        <div className="flex items-center gap-0 px-6 pt-4 pb-0">
-          {(["subtasks", "learn", "quiz", "complete"] as FlowStep[]).map((step, i) => {
-            const labels = ["Sub-tasks", "AI Tutor", "Verify", "Complete"];
-            const icons = ["ri-list-check-2", "ri-sparkling-2-fill", "ri-question-answer-line", "ri-checkbox-circle-line"];
-            const isActive = flowStep === step;
-            const isPast = ["subtasks", "learn", "quiz", "complete"].indexOf(flowStep) > i;
+        {/* Flow Tabs */}
+        <div className="flex items-center gap-0 px-6 pt-4 pb-0 border-b" style={{ borderColor: "var(--border)" }}>
+          {FLOW_TABS.map((tab, i) => {
+            const isActive = flowStep === tab.id;
+            const isPast = currentIdx > i;
+            const isClickable = isPast || isActive;
             return (
-              <div key={step} className="flex items-center">
+              <div key={tab.id} className="flex items-center">
                 <button
                   type="button"
-                  onClick={() => {
-                    if (isPast || isActive) setFlowStep(step);
-                  }}
-                  className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-t-lg transition-all cursor-pointer whitespace-nowrap border-b-2 ${
+                  onClick={() => { if (isClickable) setFlowStep(tab.id); }}
+                  className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium border-b-2 transition-all whitespace-nowrap -mb-px ${
                     isActive
-                      ? `${accentText} border-current bg-gray-50`
-                      : isPast
-                      ? "text-gray-400 border-transparent hover:text-gray-600"
-                      : "text-gray-300 border-transparent cursor-not-allowed"
+                      ? "border-violet-500 text-violet-400"
+                      : isClickable
+                      ? "border-transparent cursor-pointer"
+                      : "border-transparent cursor-not-allowed"
                   }`}
+                  style={!isActive ? { color: isClickable ? "var(--text-muted)" : "var(--text-disabled)" } : {}}
                 >
-                  <i className={`${icons[i]} text-sm`} />
-                  {labels[i]}
-                  {isPast && <i className="ri-check-line text-emerald-500 text-xs" />}
+                  <i className={`${tab.icon} text-sm`} />
+                  {tab.label}
+                  {isPast && <i className="ri-check-line text-emerald-400 text-xs" />}
                 </button>
-                {i < 3 && <i className="ri-arrow-right-s-line text-gray-200 text-sm" />}
+                {i < 3 && (
+                  <i className="ri-arrow-right-s-line text-sm" style={{ color: "var(--border)" }} />
+                )}
               </div>
             );
           })}
@@ -344,19 +365,20 @@ export default function TaskDetailPanel({
           {flowStep === "subtasks" && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <p className="text-sm font-semibold text-gray-700">Complete these steps first</p>
-                <span className="text-xs text-gray-400">{doneSubs}/{subTasks.length} done</span>
+                <p className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>Complete these steps first</p>
+                <span className="text-xs" style={{ color: "var(--text-muted)" }}>{doneSubs}/{subTasks.length} done</span>
               </div>
 
               <div className="flex flex-col gap-2 mb-5">
                 {subTasks.map((sub, idx) => (
                   <div
                     key={sub.id}
-                    className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${
-                      sub.done
-                        ? "bg-gray-50 border-gray-100 opacity-70"
-                        : "bg-white border-gray-200 hover:border-gray-300"
-                    }`}
+                    className="flex items-center gap-3 p-3.5 rounded-xl border transition-all cursor-pointer"
+                    style={{
+                      backgroundColor: sub.done ? "var(--bg-elevated)" : "var(--bg-surface)",
+                      borderColor: "var(--border)",
+                      opacity: sub.done ? 0.7 : 1,
+                    }}
                     onClick={() => onSubTaskToggle(sub.id)}
                   >
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
@@ -365,12 +387,15 @@ export default function TaskDetailPanel({
                           <i className="ri-check-line text-white text-xs" />
                         </div>
                       ) : (
-                        <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center text-xs font-bold text-gray-400">
+                        <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs font-bold" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
                           {idx + 1}
                         </div>
                       )}
                     </div>
-                    <p className={`text-sm flex-1 ${sub.done ? "text-gray-400 line-through" : "text-gray-800"}`}>
+                    <p
+                      className={`text-sm flex-1 ${sub.done ? "line-through" : ""}`}
+                      style={{ color: sub.done ? "var(--text-muted)" : "var(--text-primary)" }}
+                    >
                       {sub.text}
                     </p>
                   </div>
@@ -379,11 +404,9 @@ export default function TaskDetailPanel({
 
               {/* Progress bar */}
               <div className="mb-5">
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "var(--bg-elevated)" }}>
                   <div
-                    className={`h-full rounded-full transition-all duration-700 ${
-                      stepColor === "violet" ? "bg-violet-500" : stepColor === "emerald" ? "bg-emerald-500" : "bg-amber-500"
-                    }`}
+                    className={`h-full rounded-full transition-all duration-700 ${barColor}`}
                     style={{ width: `${subTasks.length > 0 ? Math.round((doneSubs / subTasks.length) * 100) : 0}%` }}
                   />
                 </div>
@@ -397,31 +420,32 @@ export default function TaskDetailPanel({
                 {allSubsDone ? "Ask AI Tutor →" : `Complete sub-tasks to continue (${doneSubs}/${subTasks.length})`}
               </button>
               {!allSubsDone && (
-                <p className="text-center text-xs text-gray-400 mt-2">You can still preview the AI Tutor below</p>
-              )}
-              {!allSubsDone && (
-                <button
-                  type="button"
-                  onClick={() => setFlowStep("learn")}
-                  className="w-full mt-1 py-2 rounded-xl text-gray-500 text-xs font-medium hover:bg-gray-50 transition-all cursor-pointer"
-                >
-                  Preview anyway →
-                </button>
+                <>
+                  <p className="text-center text-xs mt-2" style={{ color: "var(--text-muted)" }}>You can still preview the AI Tutor below</p>
+                  <button
+                    type="button"
+                    onClick={() => setFlowStep("learn")}
+                    className="w-full mt-1 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    Preview anyway →
+                  </button>
+                </>
               )}
             </div>
           )}
 
-          {/* STEP 2: AI Tutor (was Learn) */}
+          {/* STEP 2: AI Tutor */}
           {flowStep === "learn" && (
             <div className="flex flex-col" style={{ minHeight: "420px" }}>
               {/* Chat header */}
-              <div className={`flex items-center gap-3 p-3 rounded-xl ${accentBg} border ${accentBorder} mb-4 shrink-0`}>
+              <div className="flex items-center gap-3 p-3 rounded-xl border mb-4 shrink-0" style={{ backgroundColor: "var(--accent-light)", borderColor: "var(--border)" }}>
                 <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center shrink-0">
                   <i className="ri-sparkling-2-fill text-white text-sm" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">AI Tutor</p>
-                  <p className="text-xs text-gray-500">Ask anything about this task</p>
+                  <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>AI Tutor</p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>Ask anything about this task</p>
                 </div>
                 <button
                   type="button"
@@ -435,33 +459,38 @@ export default function TaskDetailPanel({
               {/* Chat messages */}
               <div className="flex flex-col gap-4 mb-4 overflow-y-auto flex-1" style={{ maxHeight: "320px" }}>
                 {tutorMessages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
-                    style={{ animation: "fadeSlideIn 0.35s ease-out" }}
-                  >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.role === "ai" ? "bg-violet-100" : "bg-gray-200"}`}>
-                      <i className={`${msg.role === "ai" ? "ri-sparkling-2-fill text-violet-600" : "ri-user-line text-gray-500"} text-sm`} />
+                  <div key={i} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: msg.role === "ai" ? "var(--accent-light)" : "var(--bg-elevated)" }}
+                    >
+                      <i
+                        className={`${msg.role === "ai" ? "ri-sparkling-2-fill" : "ri-user-line"} text-sm`}
+                        style={{ color: msg.role === "ai" ? "var(--accent-text)" : "var(--text-muted)" }}
+                      />
                     </div>
-                    <div className={`max-w-[80%] p-4 rounded-2xl text-sm leading-relaxed ${
-                      msg.role === "ai"
-                        ? `rounded-tl-sm ${accentBg} border ${accentBorder} text-gray-800`
-                        : "rounded-tr-sm bg-gray-900 text-white"
-                    }`}>
+                    <div
+                      className={`max-w-[80%] p-4 rounded-2xl text-sm leading-relaxed ${msg.role === "ai" ? "rounded-tl-sm border" : "rounded-tr-sm"}`}
+                      style={
+                        msg.role === "ai"
+                          ? { backgroundColor: "var(--bg-elevated)", borderColor: "var(--border)", color: "var(--text-primary)" }
+                          : { backgroundColor: "var(--accent)", color: "#fff" }
+                      }
+                    >
                       {msg.text}
                     </div>
                   </div>
                 ))}
 
                 {tutorTyping && (
-                  <div className="flex gap-3" style={{ animation: "fadeSlideIn 0.35s ease-out" }}>
-                    <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
-                      <i className="ri-sparkling-2-fill text-violet-600 text-sm" />
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: "var(--accent-light)" }}>
+                      <i className="ri-sparkling-2-fill text-sm" style={{ color: "var(--accent-text)" }} />
                     </div>
-                    <div className={`px-4 py-3 rounded-2xl rounded-tl-sm ${accentBg} border ${accentBorder} flex items-center gap-1.5`}>
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                    <div className="px-4 py-3 rounded-2xl rounded-tl-sm border flex items-center gap-1.5" style={{ backgroundColor: "var(--bg-elevated)", borderColor: "var(--border)" }}>
+                      <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: "var(--text-muted)", animationDelay: "0ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: "var(--text-muted)", animationDelay: "150ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: "var(--text-muted)", animationDelay: "300ms" }} />
                     </div>
                   </div>
                 )}
@@ -469,20 +498,22 @@ export default function TaskDetailPanel({
               </div>
 
               {/* Chat input */}
-              <div className="flex items-center gap-2 pt-3 border-t border-gray-100 shrink-0">
+              <div className="flex items-center gap-2 pt-3 border-t shrink-0" style={{ borderColor: "var(--border)" }}>
                 <input
                   type="text"
                   value={tutorInput}
                   onChange={(e) => setTutorInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleTutorSend(); }}
                   placeholder="Ask a follow-up question..."
-                  className="flex-1 text-sm px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-gray-400 bg-gray-50"
+                  className="flex-1 text-sm px-4 py-2.5 rounded-xl border focus:outline-none transition-all"
+                  style={{ backgroundColor: "var(--bg-elevated)", borderColor: "var(--border)", color: "var(--text-primary)" }}
                 />
                 <button
                   type="button"
                   onClick={handleTutorSend}
                   disabled={tutorTyping}
-                  className={`w-10 h-10 flex items-center justify-center rounded-xl text-white transition-all cursor-pointer shrink-0 ${tutorTyping ? "bg-gray-300" : "bg-gray-900 hover:bg-gray-800"}`}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl text-white transition-all cursor-pointer shrink-0"
+                  style={{ backgroundColor: tutorTyping ? "var(--text-muted)" : "var(--accent)" }}
                 >
                   <i className="ri-send-plane-fill text-sm" />
                 </button>
@@ -495,10 +526,10 @@ export default function TaskDetailPanel({
             <div>
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">
-                  <i className="ri-question-answer-line text-violet-500" />
-                  <p className="text-sm font-semibold text-gray-700">Verification Check</p>
+                  <i className="ri-question-answer-line" style={{ color: "var(--accent-text)" }} />
+                  <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>Verification Check</p>
                 </div>
-                <span className="text-xs text-gray-400">Question {quizIdx + 1} of {questions.length}</span>
+                <span className="text-xs" style={{ color: "var(--text-muted)" }}>Question {quizIdx + 1} of {questions.length}</span>
               </div>
 
               {/* Progress dots */}
@@ -507,51 +538,48 @@ export default function TaskDetailPanel({
                   <div
                     key={i}
                     className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                      i < quizIdx ? "bg-emerald-400" : i === quizIdx ? (stepColor === "violet" ? "bg-violet-500" : stepColor === "emerald" ? "bg-emerald-500" : "bg-amber-500") : "bg-gray-200"
+                      i < quizIdx ? "bg-emerald-400" : i === quizIdx ? barColor : ""
                     }`}
+                    style={i > quizIdx ? { backgroundColor: "var(--bg-elevated)" } : {}}
                   />
                 ))}
               </div>
 
               <div className="mb-5">
-                <p className="text-base font-semibold text-gray-900 leading-snug mb-4">
+                <p className="text-base font-semibold leading-snug mb-4" style={{ color: "var(--text-primary)" }}>
                   {questions[quizIdx].question}
                 </p>
                 <div className="flex flex-col gap-2">
                   {questions[quizIdx].options.map((opt, i) => {
-                    let style = "border-gray-200 bg-white hover:border-gray-300 cursor-pointer";
-                    if (selectedAnswer !== null) {
-                      if (i === questions[quizIdx].correct) {
-                        style = "border-emerald-400 bg-emerald-50 cursor-default";
-                      } else if (i === selectedAnswer && i !== questions[quizIdx].correct) {
-                        style = "border-red-300 bg-red-50 cursor-default";
-                      } else {
-                        style = "border-gray-100 bg-gray-50 opacity-50 cursor-default";
-                      }
-                    }
+                    const isCorrect = selectedAnswer !== null && i === questions[quizIdx].correct;
+                    const isWrong = selectedAnswer !== null && i === selectedAnswer && i !== questions[quizIdx].correct;
+                    const isNeutral = selectedAnswer !== null && !isCorrect && !isWrong;
+                    let bgColor = "var(--bg-elevated)";
+                    let borderColor = "var(--border)";
+                    let textColor = "var(--text-primary)";
+                    let cursor = "cursor-pointer";
+                    if (isCorrect) { bgColor = "var(--success-light)"; borderColor = "var(--success)"; cursor = "cursor-default"; }
+                    else if (isWrong) { bgColor = "var(--danger-light)"; borderColor = "var(--danger)"; cursor = "cursor-default"; }
+                    else if (isNeutral) { cursor = "cursor-default"; textColor = "var(--text-muted)"; }
                     return (
                       <button
                         key={i}
                         type="button"
                         onClick={() => handleAnswerSelect(i)}
-                        className={`flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all ${style}`}
+                        className={`flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all ${cursor}`}
+                        style={{ backgroundColor: bgColor, borderColor, color: textColor }}
                       >
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 text-xs font-bold ${
-                          selectedAnswer !== null && i === questions[quizIdx].correct
-                            ? "border-emerald-500 bg-emerald-500 text-white"
-                            : selectedAnswer !== null && i === selectedAnswer && i !== questions[quizIdx].correct
-                            ? "border-red-400 bg-red-400 text-white"
-                            : "border-gray-300 text-gray-400"
-                        }`}>
-                          {selectedAnswer !== null && i === questions[quizIdx].correct ? (
-                            <i className="ri-check-line text-xs" />
-                          ) : selectedAnswer !== null && i === selectedAnswer && i !== questions[quizIdx].correct ? (
-                            <i className="ri-close-line text-xs" />
-                          ) : (
-                            String.fromCharCode(65 + i)
-                          )}
+                        <div
+                          className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 text-xs font-bold"
+                          style={{
+                            borderColor: isCorrect ? "var(--success)" : isWrong ? "var(--danger)" : "var(--border)",
+                            backgroundColor: isCorrect ? "var(--success)" : isWrong ? "var(--danger)" : "transparent",
+                            color: isCorrect || isWrong ? "#fff" : "var(--text-muted)",
+                          }}
+                        >
+                          {isCorrect ? <i className="ri-check-line text-xs" /> : isWrong ? <i className="ri-close-line text-xs" /> : String.fromCharCode(65 + i)}
                         </div>
-                        <span className="text-sm text-gray-800">{opt}</span>
+                        <span className="text-sm">{opt}</span>
                       </button>
                     );
                   })}
@@ -560,14 +588,23 @@ export default function TaskDetailPanel({
 
               {/* Explanation */}
               {answeredCorrect !== null && (
-                <div className={`p-4 rounded-xl border mb-5 ${answeredCorrect ? "bg-emerald-50 border-emerald-200" : "bg-amber-50 border-amber-200"}`}>
+                <div
+                  className="p-4 rounded-xl border mb-5"
+                  style={{
+                    backgroundColor: answeredCorrect ? "var(--success-light)" : "var(--warning-light)",
+                    borderColor: answeredCorrect ? "var(--success)" : "var(--warning)",
+                  }}
+                >
                   <div className="flex items-center gap-2 mb-1.5">
-                    <i className={`${answeredCorrect ? "ri-checkbox-circle-fill text-emerald-500" : "ri-information-line text-amber-500"} text-base`} />
-                    <p className={`text-xs font-semibold ${answeredCorrect ? "text-emerald-700" : "text-amber-700"}`}>
+                    <i
+                      className={`${answeredCorrect ? "ri-checkbox-circle-fill" : "ri-information-line"} text-base`}
+                      style={{ color: answeredCorrect ? "var(--success)" : "var(--warning)" }}
+                    />
+                    <p className="text-xs font-semibold" style={{ color: answeredCorrect ? "var(--success)" : "var(--warning)" }}>
                       {answeredCorrect ? "Correct! Great job." : "Not quite — here's why:"}
                     </p>
                   </div>
-                  <p className="text-xs text-gray-700 leading-relaxed">{questions[quizIdx].explanation}</p>
+                  <p className="text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>{questions[quizIdx].explanation}</p>
                 </div>
               )}
 
@@ -586,21 +623,21 @@ export default function TaskDetailPanel({
           {/* STEP 4: Complete */}
           {flowStep === "complete" && (
             <div className="flex flex-col items-center py-6 text-center">
-              <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
-                <i className="ri-checkbox-circle-fill text-emerald-500 text-4xl" />
+              <div className="w-20 h-20 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: "var(--success-light)" }}>
+                <i className="ri-checkbox-circle-fill text-4xl" style={{ color: "var(--success)" }} />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Task Complete!</h3>
-              <p className="text-sm text-gray-500 mb-1 max-w-sm leading-relaxed">
+              <h3 className="text-xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>Task Complete!</h3>
+              <p className="text-sm mb-1 max-w-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
                 You&apos;ve finished all sub-tasks, reviewed the learning material, and passed the verification check.
               </p>
-              <p className="text-xs text-gray-400 mb-6">Keep the momentum going — your next task is waiting.</p>
+              <p className="text-xs mb-6" style={{ color: "var(--text-muted)" }}>Keep the momentum going — your next task is waiting.</p>
 
-              <div className={`w-full p-4 rounded-xl ${accentBg} border ${accentBorder} mb-6 text-left`}>
-                <p className="text-xs font-semibold text-gray-600 mb-2">What you learned:</p>
+              <div className="w-full p-4 rounded-xl border mb-6 text-left" style={{ backgroundColor: "var(--accent-light)", borderColor: "var(--border)" }}>
+                <p className="text-xs font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>What you learned:</p>
                 {explanations.map((exp, i) => (
                   <div key={i} className="flex items-start gap-2 mb-1.5">
-                    <i className="ri-check-line text-emerald-500 text-xs mt-0.5 shrink-0" />
-                    <p className="text-xs text-gray-600 leading-snug">{exp.slice(0, 80)}...</p>
+                    <i className="ri-check-line text-xs mt-0.5 shrink-0" style={{ color: "var(--success)" }} />
+                    <p className="text-xs leading-snug" style={{ color: "var(--text-secondary)" }}>{exp.slice(0, 80)}...</p>
                   </div>
                 ))}
               </div>
@@ -617,7 +654,8 @@ export default function TaskDetailPanel({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-3 rounded-xl border border-gray-200 text-gray-500 text-sm font-medium hover:bg-gray-50 transition-all cursor-pointer whitespace-nowrap"
+                  className="px-4 py-3 rounded-xl border text-sm font-medium transition-all cursor-pointer whitespace-nowrap"
+                  style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
                 >
                   Close
                 </button>
