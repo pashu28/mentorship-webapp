@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const NAV_ITEMS = [
-  { label: "My Sessions",       icon: "ri-calendar-schedule-line", activeIcon: "ri-calendar-schedule-fill", path: "/session-dashboard" },
   { label: "My Assigned Tasks", icon: "ri-task-line",              activeIcon: "ri-task-fill",              path: "/task-dashboard" },
+  { label: "My Sessions",       icon: "ri-calendar-schedule-line", activeIcon: "ri-calendar-schedule-fill", path: "/session-dashboard" },
   { label: "Achievements",      icon: "ri-trophy-line",            activeIcon: "ri-trophy-fill",            path: "/achievements" },
   { label: "In-App Tutor",      icon: "ri-sparkling-2-line",      activeIcon: "ri-sparkling-2-fill",      path: "/tutor" },
   { label: "Resource Vault",    icon: "ri-archive-drawer-line",   activeIcon: "ri-archive-drawer-fill",   path: "/resources" },
@@ -150,9 +150,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
         }}
       >
         {/* Logo */}
-        <div
-          className={`flex items-center gap-2.5 px-4 py-5 border-b ${collapsed ? "justify-center" : ""}`}
+        <button
+          type="button"
+          onClick={() => navigate("/task-dashboard")}
+          className={`flex items-center gap-2.5 px-4 py-5 border-b w-full cursor-pointer transition-opacity hover:opacity-80 ${collapsed ? "justify-center" : ""}`}
           style={{ borderColor: "var(--border)" }}
+          title="Go to Dashboard"
         >
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
@@ -168,7 +171,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               GrowthFlow
             </span>
           )}
-        </div>
+        </button>
 
         {/* Nav items */}
         <nav className="flex-1 flex flex-col gap-1 px-2 py-4">

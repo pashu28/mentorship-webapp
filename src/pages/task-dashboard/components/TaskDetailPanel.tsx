@@ -412,24 +412,53 @@ export default function TaskDetailPanel({
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setFlowStep("learn")}
-                className={`w-full py-3 rounded-xl text-white font-semibold text-sm transition-all cursor-pointer whitespace-nowrap ${accentBtn} ${!allSubsDone ? "opacity-60" : ""}`}
-              >
-                {allSubsDone ? "Ask AI Tutor →" : `Complete sub-tasks to continue (${doneSubs}/${subTasks.length})`}
-              </button>
-              {!allSubsDone && (
+              {allSubsDone && questions.length > 0 ? (
                 <>
-                  <p className="text-center text-xs mt-2" style={{ color: "var(--text-muted)" }}>You can still preview the AI Tutor below</p>
+                  <p className="text-xs mb-3 font-medium text-center" style={{ color: "var(--text-muted)" }}>
+                    All sub-tasks done! Choose how to continue:
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setFlowStep("learn")}
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border font-semibold text-sm transition-all cursor-pointer whitespace-nowrap"
+                      style={{ borderColor: "var(--border)", color: "var(--text-secondary)", backgroundColor: "var(--bg-elevated)" }}
+                    >
+                      <i className="ri-sparkling-2-fill text-sm" />
+                      Ask AI Tutor
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFlowStep("quiz")}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-white font-semibold text-sm transition-all cursor-pointer whitespace-nowrap ${accentBtn}`}
+                    >
+                      <i className="ri-question-answer-line text-sm" />
+                      Start Quiz
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
                   <button
                     type="button"
                     onClick={() => setFlowStep("learn")}
-                    className="w-full mt-1 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer"
-                    style={{ color: "var(--text-muted)" }}
+                    className={`w-full py-3 rounded-xl text-white font-semibold text-sm transition-all cursor-pointer whitespace-nowrap ${accentBtn} ${!allSubsDone ? "opacity-60" : ""}`}
                   >
-                    Preview anyway →
+                    {allSubsDone ? "Ask AI Tutor →" : `Complete sub-tasks to continue (${doneSubs}/${subTasks.length})`}
                   </button>
+                  {!allSubsDone && (
+                    <>
+                      <p className="text-center text-xs mt-2" style={{ color: "var(--text-muted)" }}>You can still preview the AI Tutor below</p>
+                      <button
+                        type="button"
+                        onClick={() => setFlowStep("learn")}
+                        className="w-full mt-1 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer"
+                        style={{ color: "var(--text-muted)" }}
+                      >
+                        Preview anyway →
+                      </button>
+                    </>
+                  )}
                 </>
               )}
             </div>

@@ -45,15 +45,15 @@ export default function IntakePage() {
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "var(--bg-base)" }}>
       <OnboardingNav currentStep={0} unlockedUpTo={0} />
 
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-16">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-6">
         <div className="w-full max-w-2xl">
 
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-black leading-tight mb-3" style={{ color: "var(--text-primary)" }}>
+          <div className="text-center mb-6">
+            <h1 className="text-3xl md:text-4xl font-black leading-tight mb-2" style={{ color: "var(--text-primary)" }}>
               Hey, {userName}! 👋
             </h1>
-            <p className="text-lg mb-1" style={{ color: "var(--text-muted)" }}>
+            <p className="text-base mb-0.5" style={{ color: "var(--text-muted)" }}>
               Let&apos;s build your{" "}
               <span className="font-semibold" style={{ color: "var(--text-secondary)" }}>
                 mentorship profile.
@@ -70,9 +70,8 @@ export default function IntakePage() {
             onDragLeave={() => setIsDragging(false)}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            className="relative w-full rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer mb-8"
+            className="relative w-full rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer mb-5"
             style={{
-              minHeight: "220px",
               borderColor: isDragging ? "var(--accent)" : uploadedFile ? "var(--success)" : "var(--border)",
               backgroundColor: isDragging ? "var(--accent-light)" : uploadedFile ? "var(--success-light)" : "var(--bg-surface)",
             }}
@@ -84,18 +83,18 @@ export default function IntakePage() {
               className="hidden"
               onChange={handleFileChange}
             />
-            <div className="flex flex-col items-center justify-center py-14 px-8 text-center">
+            <div className="flex flex-col items-center justify-center py-7 px-8 text-center">
               {uploadedFile ? (
                 <>
-                  <div className="w-16 h-16 flex items-center justify-center rounded-full mb-4" style={{ backgroundColor: "var(--success-light)" }}>
-                    <i className="ri-file-check-line text-3xl" style={{ color: "var(--success)" }} />
+                  <div className="w-12 h-12 flex items-center justify-center rounded-full mb-3" style={{ backgroundColor: "var(--success-light)" }}>
+                    <i className="ri-file-check-line text-2xl" style={{ color: "var(--success)" }} />
                   </div>
-                  <p className="font-semibold text-lg" style={{ color: "var(--success)" }}>{uploadedFile.name}</p>
-                  <p className="text-sm mt-1" style={{ color: "var(--success)" }}>Resume uploaded successfully</p>
+                  <p className="font-semibold text-base" style={{ color: "var(--success)" }}>{uploadedFile.name}</p>
+                  <p className="text-sm mt-0.5" style={{ color: "var(--success)" }}>Resume uploaded successfully</p>
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setUploadedFile(null); }}
-                    className="mt-3 text-xs underline cursor-pointer"
+                    className="mt-2 text-xs underline cursor-pointer"
                     style={{ color: "var(--text-muted)" }}
                   >
                     Remove file
@@ -103,14 +102,14 @@ export default function IntakePage() {
                 </>
               ) : (
                 <>
-                  <div className="w-16 h-16 flex items-center justify-center rounded-full mb-4 transition-all" style={{ backgroundColor: isDragging ? "var(--accent-light)" : "var(--bg-elevated)" }}>
-                    <i className={`ri-upload-cloud-2-line text-3xl transition-all`} style={{ color: isDragging ? "var(--accent)" : "var(--text-muted)" }} />
+                  <div className="w-12 h-12 flex items-center justify-center rounded-full mb-3 transition-all" style={{ backgroundColor: isDragging ? "var(--accent-light)" : "var(--bg-elevated)" }}>
+                    <i className="ri-upload-cloud-2-line text-2xl transition-all" style={{ color: isDragging ? "var(--accent)" : "var(--text-muted)" }} />
                   </div>
-                  <p className="font-semibold text-lg mb-1" style={{ color: "var(--text-primary)" }}>
+                  <p className="font-semibold text-base mb-0.5" style={{ color: "var(--text-primary)" }}>
                     {isDragging ? "Drop it here!" : "Drag your resume here"}
                   </p>
                   <p className="text-sm" style={{ color: "var(--text-muted)" }}>or click to browse — PDF only</p>
-                  <div className="mt-4 px-4 py-1.5 rounded-full text-xs font-medium" style={{ backgroundColor: "var(--bg-elevated)", color: "var(--text-muted)" }}>
+                  <div className="mt-3 px-4 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: "var(--bg-elevated)", color: "var(--text-muted)" }}>
                     PDF up to 10MB
                   </div>
                 </>
@@ -119,7 +118,7 @@ export default function IntakePage() {
           </div>
 
           {/* Input Fields */}
-          <div className="flex flex-col gap-5 mb-10">
+          <div className="flex flex-col gap-3.5 mb-5">
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center">
                 <i className="ri-sparkling-2-line text-base" style={{ color: "var(--accent)" }} />
@@ -129,7 +128,7 @@ export default function IntakePage() {
                 value={dreamRole}
                 onChange={(e) => setDreamRole(e.target.value)}
                 placeholder="What is your dream role?"
-                className="w-full pl-11 pr-4 py-4 rounded-xl border text-sm focus:outline-none transition-all"
+                className="w-full pl-11 pr-4 py-3 rounded-xl border text-sm focus:outline-none transition-all"
                 style={{
                   backgroundColor: "var(--bg-surface)",
                   borderColor: "var(--border)",
@@ -138,15 +137,15 @@ export default function IntakePage() {
               />
             </div>
             <div className="relative">
-              <div className="absolute left-4 top-4 w-5 h-5 flex items-center justify-center">
+              <div className="absolute left-4 top-3.5 w-5 h-5 flex items-center justify-center">
                 <i className="ri-focus-3-line text-base" style={{ color: "var(--accent)" }} />
               </div>
               <textarea
                 value={challenge}
                 onChange={(e) => setChallenge(e.target.value)}
                 placeholder="What is your biggest current challenge?"
-                rows={3}
-                className="w-full pl-11 pr-4 py-4 rounded-xl border text-sm focus:outline-none transition-all resize-none"
+                rows={2}
+                className="w-full pl-11 pr-4 py-3 rounded-xl border text-sm focus:outline-none transition-all resize-none"
                 style={{
                   backgroundColor: "var(--bg-surface)",
                   borderColor: "var(--border)",
@@ -161,7 +160,7 @@ export default function IntakePage() {
             type="button"
             onClick={handleGenerate}
             disabled={isGenerating}
-            className="w-full py-5 rounded-xl text-white font-bold text-base transition-all duration-200 hover:scale-[1.02] flex items-center justify-center gap-3 whitespace-nowrap cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed"
+            className="w-full py-3.5 rounded-xl text-white font-bold text-base transition-all duration-200 hover:scale-[1.02] flex items-center justify-center gap-3 whitespace-nowrap cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed"
             style={{ background: "linear-gradient(to right, var(--accent), var(--accent))" }}
           >
             {isGenerating ? (
@@ -178,7 +177,7 @@ export default function IntakePage() {
             )}
           </button>
 
-          <p className="text-center text-xs mt-4" style={{ color: "var(--text-muted)" }}>
+          <p className="text-center text-xs mt-3" style={{ color: "var(--text-muted)" }}>
             Your data is private and never shared without your consent.
           </p>
         </div>

@@ -130,9 +130,14 @@ export default function TaskDetailScreen({ task, onSubTaskToggle, onTaskComplete
 
   const isTabClickable = (tabId: FlowStep) => {
     if (tabId === "overview" || tabId === "learn") return true;
-    if (tabId === "quiz") return quizUnlocked || completeUnlocked;
+    if (tabId === "quiz") return quizUnlocked || completeUnlocked || allSubsDone;
     if (tabId === "complete") return completeUnlocked;
     return false;
+  };
+
+  const handleStartQuizDirectly = () => {
+    setQuizUnlocked(true);
+    setFlowStep("quiz");
   };
 
   return (
@@ -479,16 +484,49 @@ export default function TaskDetailScreen({ task, onSubTaskToggle, onTaskComplete
 
         {/* Bottom Action Bar */}
         {flowStep === "overview" && (
-          <div className="border-t px-6 py-4 flex items-center gap-3 shrink-0" style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-surface)" }}>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                {allSubsDone ? "All sub-tasks done! Ready to learn." : `${doneSubs}/${task.subTasks.length} sub-tasks complete`}
-              </p>
-            </div>
-            <button type="button" onClick={() => setFlowStep("learn")} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-semibold text-sm transition-all cursor-pointer whitespace-nowrap ${style.btn}`}>
-              <i className="ri-sparkling-2-fill text-sm" />
-              Ask AI Tutor
-            </button>
+          <div className="border-t px-6 py-4 shrink-0" style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-surface)" }}>
+            {allSubsDone && questions.length > 0 ? (
+              <>
+                <p className="text-xs mb-3 font-medium" style={{ color: "var(--text-muted)" }}>
+                  All sub-tasks done! Choose how to continue:
+                </p>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFlowStep("learn")}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border font-semibold text-sm transition-all cursor-pointer whitespace-nowrap"
+                    style={{ borderColor: "var(--border)", color: "var(--text-secondary)", backgroundColor: "var(--bg-elevated)" }}
+                  >
+                    <i className="ri-sparkling-2-fill text-sm" />
+                    Ask AI Tutor
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleStartQuizDirectly}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all cursor-pointer whitespace-nowrap ${style.btn}`}
+                  >
+                    <i className="ri-question-answer-line text-sm" />
+                    Start Quiz Now
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    {allSubsDone ? "All sub-tasks done! Ready to learn." : `${doneSubs}/${task.subTasks.length} sub-tasks complete`}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFlowStep("learn")}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-semibold text-sm transition-all cursor-pointer whitespace-nowrap ${style.btn}`}
+                >
+                  <i className="ri-sparkling-2-fill text-sm" />
+                  Ask AI Tutor
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -2,14 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/feature/AppLayout";
 import { useTheme } from "@/hooks/useTheme";
+import { useAchievements } from "@/hooks/useAchievements";
 import {
   BADGE_DEFS,
-  earnedBadgeHistory,
-  completedTaskHistory,
-  creditsLedger,
-  redemptionOptions,
-  achievementStats,
   CREDITS_PER_TASK,
+  redemptionOptions,
   type BadgeDef,
 } from "@/mocks/achievements";
 
@@ -17,10 +14,6 @@ import {
 
 function getBadgeDef(badgeId: string): BadgeDef | undefined {
   return BADGE_DEFS.find((b) => b.id === badgeId);
-}
-
-function isBadgeEarned(badgeId: string): boolean {
-  return earnedBadgeHistory.some((e) => e.badgeId === badgeId);
 }
 
 // ── Tabs ───────────────────────────────────────────────────────────────────
@@ -34,14 +27,28 @@ const TABS: { id: TabId; label: string; icon: string }[] = [
   { id: "credits",  label: "Credits & Rewards", icon: "ri-coin-line" },
 ];
 
+// ── Badge dark-mode color map ──────────────────────────────────────────────
+const BADGE_DARK: Record<string, { bg: string; border: string; color: string }> = {
+  "text-violet-500": { bg: "rgba(139,92,246,0.18)", border: "rgba(139,92,246,0.4)", color: "#C4B5FD" },
+  "text-violet-600": { bg: "rgba(139,92,246,0.18)", border: "rgba(139,92,246,0.4)", color: "#C4B5FD" },
+  "text-emerald-600": { bg: "rgba(52,211,153,0.15)", border: "rgba(52,211,153,0.35)", color: "#6EE7B7" },
+  "text-emerald-700": { bg: "rgba(52,211,153,0.15)", border: "rgba(52,211,153,0.35)", color: "#6EE7B7" },
+};
+
+function getBadgeDarkStyle(colorClass: string) {
+  return BADGE_DARK[colorClass] ?? { bg: "rgba(139,92,246,0.18)", border: "rgba(139,92,246,0.4)", color: "#C4B5FD" };
+}
+
 // ── Credits Hero ───────────────────────────────────────────────────────────
 
 function CreditsHero() {
   const { isDark } = useTheme();
-  const { totalCreditsEarned, totalCreditsRedeemed, creditsFromTasks, creditsFromBadges,
-          totalTasksCompleted, totalBadgesEarned, nextBadge, tasksToNextBadge } = achievementStats;
-  const balance = totalCreditsEarned - totalCreditsRedeemed;
-  const nextBadgeDef = getBadgeDef(nextBadge);
+  const stats = useAchievements();
+  const {
+    totalCreditsEarned, totalCreditsRedeemed, creditsFromTasks, creditsFromBadges,
+    totalTasksCompleted, totalBadgesEarned, nextBadgeDef, tasksToNextBadge, balance,
+  } = stats;
+
   const pct = nextBadgeDef
     ? Math.min(Math.round((totalTasksCompleted / nextBadgeDef.tasksRequired) * 100), 100)
     : 100;
@@ -70,15 +77,20 @@ function CreditsHero() {
           </div>
 
           {/* Breakdown */}
-          <div className="rounded-xl px-4 py-3 mb-4 border" style={{ backgroundColor: isDark ? innerCardBg : "rgba(255,255,255,0.75)", borderColor: isDark ? "var(--border)" : "rgba(255,255,255,0.6)" }}>
-            <p className="text-xs font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>How your {totalCreditsEarned} credits were earned:</p>
+          <div className="rounded-xl px-4 py-3 mb-4 border"
+            style={{ backgroundColor: innerCardBg, borderColor: isDark ? "var(--border)" : "rgba(255,255,255,0.6)" }}>
+            <p className="text-xs font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>
+              How your {totalCreditsEarned} credits were earned:
+            </p>
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 flex items-center justify-center rounded-full shrink-0" style={{ backgroundColor: "var(--success-light)" }}>
                     <i className="ri-checkbox-circle-fill text-xs" style={{ color: "var(--success)" }} />
                   </div>
-                  <span className="text-xs" style={{ color: "var(--text-secondary)" }}>{totalTasksCompleted} tasks × {CREDITS_PER_TASK} credits each</span>
+                  <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                    {totalTasksCompleted} task{totalTasksCompleted !== 1 ? "s" : ""} × {CREDITS_PER_TASK} credits each
+                  </span>
                 </div>
                 <span className="text-xs font-bold" style={{ color: "var(--success)" }}>+{creditsFromTasks}</span>
               </div>
@@ -87,7 +99,9 @@ function CreditsHero() {
                   <div className="w-5 h-5 flex items-center justify-center rounded-full shrink-0" style={{ backgroundColor: "var(--warning-light)" }}>
                     <i className="ri-trophy-fill text-xs" style={{ color: "var(--warning)" }} />
                   </div>
-                  <span className="text-xs" style={{ color: "var(--text-secondary)" }}>{totalBadgesEarned} badge{totalBadgesEarned !== 1 ? "s" : ""} unlocked — bonus credits</span>
+                  <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                    {totalBadgesEarned} badge{totalBadgesEarned !== 1 ? "s" : ""} unlocked — bonus credits
+                  </span>
                 </div>
                 <span className="text-xs font-bold" style={{ color: "var(--warning)" }}>+{creditsFromBadges}</span>
               </div>
@@ -99,7 +113,7 @@ function CreditsHero() {
           </div>
 
           {/* Progress to next badge */}
-          {nextBadgeDef && (
+          {nextBadgeDef ? (
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-1.5">
@@ -108,7 +122,9 @@ function CreditsHero() {
                     Next badge: <span className="font-bold">{nextBadgeDef.name}</span>
                   </span>
                 </div>
-                <span className="text-xs font-bold" style={{ color: "var(--text-muted)" }}>{totalTasksCompleted} / {nextBadgeDef.tasksRequired} tasks</span>
+                <span className="text-xs font-bold" style={{ color: "var(--text-muted)" }}>
+                  {totalTasksCompleted} / {nextBadgeDef.tasksRequired} tasks
+                </span>
               </div>
               <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: progressTrackBg }}>
                 <div className="h-full rounded-full transition-all duration-700"
@@ -118,15 +134,20 @@ function CreditsHero() {
                 Complete {tasksToNextBadge} more task{tasksToNextBadge !== 1 ? "s" : ""} to unlock {nextBadgeDef.name} (+{nextBadgeDef.bonusCredits} bonus credits)
               </p>
             </div>
+          ) : (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ backgroundColor: "var(--success-light)" }}>
+              <i className="ri-checkbox-circle-fill text-sm" style={{ color: "var(--success)" }} />
+              <p className="text-xs font-semibold" style={{ color: "var(--success)" }}>All badges unlocked — you&apos;re a champion!</p>
+            </div>
           )}
         </div>
 
-        {/* Stat cards — solid bg in dark for readability */}
+        {/* Stat cards */}
         <div className="grid grid-cols-3 lg:grid-cols-1 gap-3 lg:w-44 shrink-0">
           {[
-            { label: "Tasks Done",    value: totalTasksCompleted,       icon: "ri-checkbox-circle-fill", colorVar: "var(--success)" },
-            { label: "Badges Earned", value: totalBadgesEarned,         icon: "ri-medal-fill",           colorVar: "var(--warning)" },
-            { label: "Total Earned",  value: `${totalCreditsEarned} cr`,icon: "ri-coin-fill",            colorVar: "var(--accent)" },
+            { label: "Tasks Done",    value: totalTasksCompleted,        icon: "ri-checkbox-circle-fill", colorVar: "var(--success)" },
+            { label: "Badges Earned", value: totalBadgesEarned,          icon: "ri-medal-fill",           colorVar: "var(--warning)" },
+            { label: "Total Earned",  value: `${totalCreditsEarned} cr`, icon: "ri-coin-fill",            colorVar: "var(--accent)" },
           ].map((stat) => (
             <div key={stat.label} className="rounded-xl px-3 py-3 flex items-center gap-2.5 border"
               style={{ backgroundColor: isDark ? innerCardBg : "rgba(255,255,255,0.85)", borderColor: isDark ? "var(--border)" : "rgba(255,255,255,0.6)" }}>
@@ -145,31 +166,19 @@ function CreditsHero() {
   );
 }
 
-// ── Badge dark-mode color map ──────────────────────────────────────────────
-// Maps the light Tailwind color class to dark-mode inline style values
-const BADGE_DARK: Record<string, { bg: string; border: string; color: string }> = {
-  "text-violet-500": { bg: "rgba(139,92,246,0.18)", border: "rgba(139,92,246,0.4)", color: "#C4B5FD" },
-  "text-violet-600": { bg: "rgba(139,92,246,0.18)", border: "rgba(139,92,246,0.4)", color: "#C4B5FD" },
-  "text-emerald-600": { bg: "rgba(52,211,153,0.15)", border: "rgba(52,211,153,0.35)", color: "#6EE7B7" },
-  "text-emerald-700": { bg: "rgba(52,211,153,0.15)", border: "rgba(52,211,153,0.35)", color: "#6EE7B7" },
-};
-
-function getBadgeDarkStyle(colorClass: string) {
-  return BADGE_DARK[colorClass] ?? { bg: "rgba(139,92,246,0.18)", border: "rgba(139,92,246,0.4)", color: "#C4B5FD" };
-}
-
 // ── Overview Tab ───────────────────────────────────────────────────────────
 
 function OverviewTab({ onTabChange }: { onTabChange: (tab: TabId) => void }) {
   const { isDark } = useTheme();
-  const balance = achievementStats.totalCreditsEarned - achievementStats.totalCreditsRedeemed;
-  const recentTasks = [...completedTaskHistory].reverse().slice(0, 5);
+  const stats = useAchievements();
+  const { balance, liveCompletedTasks, earnedBadgeDefs } = stats;
+  const recentTasks = [...liveCompletedTasks].reverse().slice(0, 5);
 
   return (
     <div className="flex flex-col gap-6">
       <CreditsHero />
 
-      {/* How it works — always visible explainer */}
+      {/* How it works */}
       <div className="rounded-2xl border p-5" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>
         <div className="flex items-center gap-2 mb-4">
           <i className="ri-information-line text-base" style={{ color: "var(--accent)" }} />
@@ -206,21 +215,28 @@ function OverviewTab({ onTabChange }: { onTabChange: (tab: TabId) => void }) {
             <button type="button" onClick={() => onTabChange("history")}
               className="text-xs cursor-pointer whitespace-nowrap" style={{ color: "var(--accent)" }}>View all →</button>
           </div>
-          <div className="flex flex-col gap-2.5">
-            {recentTasks.map((task) => (
-              <div key={task.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl border"
-                style={{ backgroundColor: "var(--success-light)", borderColor: "var(--success-light)" }}>
-                <div className="w-7 h-7 flex items-center justify-center rounded-full shrink-0" style={{ backgroundColor: "var(--success-light)" }}>
-                  <i className="ri-check-line text-sm" style={{ color: "var(--success)" }} />
+          {recentTasks.length === 0 ? (
+            <div className="flex flex-col items-center py-8 gap-2 text-center">
+              <i className="ri-checkbox-blank-circle-line text-3xl" style={{ color: "var(--border)" }} />
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>No tasks completed yet. Head to the task dashboard to get started!</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2.5">
+              {recentTasks.map((task) => (
+                <div key={task.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl border"
+                  style={{ backgroundColor: "var(--success-light)", borderColor: "var(--success-light)" }}>
+                  <div className="w-7 h-7 flex items-center justify-center rounded-full shrink-0" style={{ backgroundColor: "var(--success-light)" }}>
+                    <i className="ri-check-line text-sm" style={{ color: "var(--success)" }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold truncate" style={{ color: "var(--text-primary)" }}>{task.taskTitle}</p>
+                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>{task.stepLabel} · {task.completedAt}</p>
+                  </div>
+                  <span className="text-xs font-bold whitespace-nowrap" style={{ color: "var(--success)" }}>+{task.creditsEarned} cr</span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold truncate" style={{ color: "var(--text-primary)" }}>{task.taskTitle}</p>
-                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>{task.stepLabel} · {task.completedAt}</p>
-                </div>
-                <span className="text-xs font-bold whitespace-nowrap" style={{ color: "var(--success)" }}>+{task.creditsEarned} cr</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Redeem preview */}
@@ -275,7 +291,7 @@ function OverviewTab({ onTabChange }: { onTabChange: (tab: TabId) => void }) {
         </div>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
           {BADGE_DEFS.map((badge) => {
-            const earned = isBadgeEarned(badge.id);
+            const earned = earnedBadgeDefs.some((b) => b.id === badge.id);
             const ds = isDark ? getBadgeDarkStyle(badge.color) : null;
             return (
               <div key={badge.id}
@@ -322,7 +338,9 @@ function OverviewTab({ onTabChange }: { onTabChange: (tab: TabId) => void }) {
 
 function BadgesTab() {
   const { isDark } = useTheme();
-  const { totalTasksCompleted } = achievementStats;
+  const stats = useAchievements();
+  const { totalTasksCompleted, earnedBadgeDefs, liveEarnedBadges } = stats;
+
   return (
     <div className="flex flex-col gap-6">
       <div className="rounded-2xl border p-6" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>
@@ -336,14 +354,14 @@ function BadgesTab() {
           Badges never reset — once earned, they&apos;re yours forever.
         </p>
         <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-          You&apos;ve completed <strong style={{ color: "var(--text-primary)" }}>{totalTasksCompleted} tasks</strong> so far.
+          You&apos;ve completed <strong style={{ color: "var(--text-primary)" }}>{totalTasksCompleted} task{totalTasksCompleted !== 1 ? "s" : ""}</strong> so far.
         </p>
       </div>
 
       <div className="flex flex-col gap-4">
         {BADGE_DEFS.map((badge) => {
-          const earned = isBadgeEarned(badge.id);
-          const earnedEntry = earnedBadgeHistory.find((e) => e.badgeId === badge.id);
+          const earned = earnedBadgeDefs.some((b) => b.id === badge.id);
+          const earnedEntry = liveEarnedBadges.find((e) => e.badgeId === badge.id);
           const pct = Math.min(Math.round((totalTasksCompleted / badge.tasksRequired) * 100), 100);
           const ds = isDark ? getBadgeDarkStyle(badge.color) : null;
 
@@ -448,14 +466,17 @@ function BadgesTab() {
 
 function TaskHistoryTab() {
   const { isDark } = useTheme();
-  const sorted = [...completedTaskHistory].reverse();
+  const stats = useAchievements();
+  const { liveCompletedTasks, liveEarnedBadges, totalTasksCompleted, totalBadgesEarned, creditsFromTasks } = stats;
+  const sorted = [...liveCompletedTasks].reverse();
+
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "Tasks Completed",    value: completedTaskHistory.length,                                    icon: "ri-checkbox-circle-fill", colorVar: "var(--success)", bgVar: "var(--success-light)" },
-          { label: "Credits from Tasks", value: completedTaskHistory.reduce((s, t) => s + t.creditsEarned, 0), icon: "ri-coin-fill",            colorVar: "var(--accent)",  bgVar: "var(--accent-light)" },
-          { label: "Badges Earned",      value: earnedBadgeHistory.length,                                      icon: "ri-trophy-fill",          colorVar: "var(--warning)", bgVar: "var(--warning-light)" },
+          { label: "Tasks Completed",    value: totalTasksCompleted, icon: "ri-checkbox-circle-fill", colorVar: "var(--success)", bgVar: "var(--success-light)" },
+          { label: "Credits from Tasks", value: creditsFromTasks,    icon: "ri-coin-fill",            colorVar: "var(--accent)",  bgVar: "var(--accent-light)" },
+          { label: "Badges Earned",      value: totalBadgesEarned,   icon: "ri-trophy-fill",          colorVar: "var(--warning)", bgVar: "var(--warning-light)" },
         ].map((stat) => (
           <div key={stat.label} className="rounded-xl border p-4 flex items-center gap-3"
             style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>
@@ -474,51 +495,52 @@ function TaskHistoryTab() {
         <div className="flex items-center gap-2 mb-4">
           <i className="ri-list-check-3 text-base" style={{ color: "var(--text-muted)" }} />
           <h2 className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>All Completed Tasks</h2>
-          <span className="text-xs ml-auto" style={{ color: "var(--text-muted)" }}>{completedTaskHistory.length} tasks</span>
+          <span className="text-xs ml-auto" style={{ color: "var(--text-muted)" }}>{totalTasksCompleted} tasks</span>
         </div>
-        <div className="flex flex-col gap-0">
-          {sorted.map((task, idx) => {
-            // Check if a badge was earned on this date
-            const badgeOnThisDate = earnedBadgeHistory.find(
-              (e) => e.dateEarned === task.completedAt && e.tasksAtTime === (completedTaskHistory.length - sorted.indexOf(task))
-            );
-            return (
-              <div key={task.id} style={idx > 0 ? { borderTop: "1px solid var(--border)" } : {}}>
-                <div className="flex items-center gap-3 py-3">
-                  <div className="w-8 h-8 flex items-center justify-center rounded-full border shrink-0"
-                    style={{ backgroundColor: "var(--success-light)", borderColor: "var(--success-light)" }}>
-                    <i className="ri-check-line text-sm" style={{ color: "var(--success)" }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>{task.taskTitle}</p>
-                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>{task.stepLabel} · {task.completedAt}</p>
-                  </div>
-                  <span className="text-sm font-bold whitespace-nowrap shrink-0" style={{ color: "var(--success)" }}>+{task.creditsEarned} cr</span>
-                </div>
-                {badgeOnThisDate && (() => {
-                  const bd = getBadgeDef(badgeOnThisDate.badgeId);
-                  if (!bd) return null;
-                  const ds = isDark ? getBadgeDarkStyle(bd.color) : null;
-                  return (
-                    <div
-                      className={`flex items-center gap-2 mx-3 mb-2 px-3 py-2 rounded-lg border ${!isDark ? `${bd.bg} ${bd.border}` : ""}`}
-                      style={isDark && ds ? { backgroundColor: ds.bg, borderColor: ds.border } : {}}>
-                      <i
-                        className={`${bd.icon} text-sm ${!isDark ? bd.color : ""}`}
-                        style={isDark && ds ? { color: ds.color } : {}}
-                      />
-                      <p
-                        className={`text-xs font-semibold ${!isDark ? bd.color : ""}`}
-                        style={isDark && ds ? { color: ds.color } : {}}>
-                        Badge unlocked: {bd.name} — +{badgeOnThisDate.bonusCreditsAwarded} bonus credits!
-                      </p>
+
+        {sorted.length === 0 ? (
+          <div className="flex flex-col items-center py-10 gap-2 text-center">
+            <i className="ri-checkbox-blank-circle-line text-3xl" style={{ color: "var(--border)" }} />
+            <p className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>No tasks completed yet</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Complete tasks on the task dashboard to see your history here.</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-0">
+            {sorted.map((task, idx) => {
+              const badgeOnThisTask = liveEarnedBadges.find((e) => e.tasksAtTime === liveCompletedTasks.length - idx);
+              return (
+                <div key={task.id} style={idx > 0 ? { borderTop: "1px solid var(--border)" } : {}}>
+                  <div className="flex items-center gap-3 py-3">
+                    <div className="w-8 h-8 flex items-center justify-center rounded-full border shrink-0"
+                      style={{ backgroundColor: "var(--success-light)", borderColor: "var(--success-light)" }}>
+                      <i className="ri-check-line text-sm" style={{ color: "var(--success)" }} />
                     </div>
-                  );
-                })()}
-              </div>
-            );
-          })}
-        </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>{task.taskTitle}</p>
+                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>{task.stepLabel} · {task.completedAt}</p>
+                    </div>
+                    <span className="text-sm font-bold whitespace-nowrap shrink-0" style={{ color: "var(--success)" }}>+{task.creditsEarned} cr</span>
+                  </div>
+                  {badgeOnThisTask && (() => {
+                    const bd = getBadgeDef(badgeOnThisTask.badgeId);
+                    if (!bd) return null;
+                    const ds = isDark ? getBadgeDarkStyle(bd.color) : null;
+                    return (
+                      <div
+                        className={`flex items-center gap-2 mx-3 mb-2 px-3 py-2 rounded-lg border ${!isDark ? `${bd.bg} ${bd.border}` : ""}`}
+                        style={isDark && ds ? { backgroundColor: ds.bg, borderColor: ds.border } : {}}>
+                        <i className={`${bd.icon} text-sm ${!isDark ? bd.color : ""}`} style={isDark && ds ? { color: ds.color } : {}} />
+                        <p className={`text-xs font-semibold ${!isDark ? bd.color : ""}`} style={isDark && ds ? { color: ds.color } : {}}>
+                          Badge unlocked: {bd.name} — +{badgeOnThisTask.bonusCreditsAwarded} bonus credits!
+                        </p>
+                      </div>
+                    );
+                  })()}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -528,7 +550,8 @@ function TaskHistoryTab() {
 
 function CreditsTab() {
   const { isDark } = useTheme();
-  const balance = achievementStats.totalCreditsEarned - achievementStats.totalCreditsRedeemed;
+  const stats = useAchievements();
+  const { balance, totalTasksCompleted, totalBadgesEarned, creditsFromTasks, creditsFromBadges, totalCreditsEarned, liveLedger } = stats;
   const [redeemed, setRedeemed] = useState<string[]>([]);
 
   return (
@@ -545,16 +568,16 @@ function CreditsTab() {
           </div>
           <div className="ml-auto flex flex-col items-end gap-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs" style={{ color: "var(--text-muted)" }}>{achievementStats.totalTasksCompleted} tasks × {CREDITS_PER_TASK}</span>
-              <span className="text-xs font-bold" style={{ color: "var(--success)" }}>= +{achievementStats.creditsFromTasks}</span>
+              <span className="text-xs" style={{ color: "var(--text-muted)" }}>{totalTasksCompleted} tasks × {CREDITS_PER_TASK}</span>
+              <span className="text-xs font-bold" style={{ color: "var(--success)" }}>= +{creditsFromTasks}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs" style={{ color: "var(--text-muted)" }}>{achievementStats.totalBadgesEarned} badge bonuses</span>
-              <span className="text-xs font-bold" style={{ color: "var(--warning)" }}>= +{achievementStats.creditsFromBadges}</span>
+              <span className="text-xs" style={{ color: "var(--text-muted)" }}>{totalBadgesEarned} badge bonuses</span>
+              <span className="text-xs font-bold" style={{ color: "var(--warning)" }}>= +{creditsFromBadges}</span>
             </div>
             <div className="flex items-center gap-2 border-t pt-1" style={{ borderColor: "var(--border)" }}>
               <span className="text-xs font-semibold" style={{ color: "var(--text-secondary)" }}>Total earned</span>
-              <span className="text-xs font-black" style={{ color: "var(--text-primary)" }}>{achievementStats.totalCreditsEarned}</span>
+              <span className="text-xs font-black" style={{ color: "var(--text-primary)" }}>{totalCreditsEarned}</span>
             </div>
           </div>
         </div>
@@ -630,29 +653,36 @@ function CreditsTab() {
           <i className="ri-receipt-line text-base" style={{ color: "var(--text-muted)" }} />
           <h2 className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>Credits History</h2>
         </div>
-        <div className="flex flex-col gap-0">
-          {[...creditsLedger].reverse().map((entry, idx) => {
-            const badge = entry.badgeId ? getBadgeDef(entry.badgeId) : undefined;
-            const isBadgeEntry = entry.type === "badge";
-            return (
-              <div key={entry.id} className="flex items-center gap-3 py-3" style={idx > 0 ? { borderTop: "1px solid var(--border)" } : {}}>
-                <div className="w-8 h-8 flex items-center justify-center rounded-lg shrink-0"
-                  style={{ backgroundColor: isBadgeEntry ? "var(--warning-light)" : "var(--success-light)" }}>
-                  <i className={`${isBadgeEntry ? (badge?.icon ?? "ri-trophy-line") : "ri-checkbox-circle-line"} text-sm`}
-                    style={{ color: isBadgeEntry ? "var(--warning)" : "var(--success)" }} />
+        {liveLedger.length === 0 ? (
+          <div className="flex flex-col items-center py-8 gap-2 text-center">
+            <i className="ri-coin-line text-3xl" style={{ color: "var(--border)" }} />
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>No credits earned yet. Complete tasks to start earning!</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-0">
+            {[...liveLedger].reverse().map((entry, idx) => {
+              const badge = entry.badgeId ? getBadgeDef(entry.badgeId) : undefined;
+              const isBadgeEntry = entry.type === "badge";
+              return (
+                <div key={entry.id} className="flex items-center gap-3 py-3" style={idx > 0 ? { borderTop: "1px solid var(--border)" } : {}}>
+                  <div className="w-8 h-8 flex items-center justify-center rounded-lg shrink-0"
+                    style={{ backgroundColor: isBadgeEntry ? "var(--warning-light)" : "var(--success-light)" }}>
+                    <i className={`${isBadgeEntry ? (badge?.icon ?? "ri-trophy-line") : "ri-checkbox-circle-line"} text-sm`}
+                      style={{ color: isBadgeEntry ? "var(--warning)" : "var(--success)" }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium" style={{ color: "var(--text-primary)" }}>{entry.description}</p>
+                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>{entry.date}</p>
+                  </div>
+                  <span className="text-sm font-bold whitespace-nowrap shrink-0"
+                    style={{ color: entry.type === "redeemed" ? "var(--danger)" : isBadgeEntry ? "var(--warning)" : "var(--success)" }}>
+                    +{entry.amount} cr
+                  </span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium" style={{ color: "var(--text-primary)" }}>{entry.description}</p>
-                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>{entry.date}</p>
-                </div>
-                <span className="text-sm font-bold whitespace-nowrap shrink-0"
-                  style={{ color: entry.type === "redeemed" ? "var(--danger)" : isBadgeEntry ? "var(--warning)" : "var(--success)" }}>
-                  +{entry.amount} cr
-                </span>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -663,7 +693,8 @@ function CreditsTab() {
 export default function AchievementsPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabId>("overview");
-  const balance = achievementStats.totalCreditsEarned - achievementStats.totalCreditsRedeemed;
+  const stats = useAchievements();
+  const { balance } = stats;
 
   return (
     <AppLayout>

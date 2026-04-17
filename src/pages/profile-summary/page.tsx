@@ -111,10 +111,7 @@ export default function ProfileSummaryPage() {
                       </div>
                       <span className="text-xs font-semibold" style={{ color: "var(--text-secondary)" }}>AI Mentor Snapshot</span>
                     </div>
-                    <span className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--success)" }}>
-                      <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ backgroundColor: "var(--success)" }} />
-                      Live
-                    </span>
+
                   </div>
 
                   <p className="text-xs leading-relaxed mb-2" style={{ color: "var(--text-muted)" }}>
