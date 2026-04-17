@@ -90,7 +90,7 @@ export default function StepEmail({ onNext }: Props) {
           {loading ? (
             <><i className="ri-loader-4-line animate-spin" />Sending code...</>
           ) : (
-            <>Send my code<i className="ri-arrow-right-line" /></>
+            <>Continue<i className="ri-arrow-right-line" /></>
           )}
         </button>
       </form>
