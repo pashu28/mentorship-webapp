@@ -1,6 +1,53 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
+/* ── Small toggle switch component ── */
+function ToggleSwitch({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!value)}
+      className="relative inline-flex items-center flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200"
+      style={{
+        width: "44px",
+        height: "24px",
+        backgroundColor: value ? "#7C3AED" : "#9CA3AF",
+      }}
+    >
+      <span
+        className="rounded-full bg-white shadow-sm transition-transform duration-200"
+        style={{
+          width: "18px",
+          height: "18px",
+          transform: value ? "translateX(23px)" : "translateX(3px)",
+          display: "block",
+          flexShrink: 0,
+        }}
+      />
+    </button>
+  );
+}
+
+function BackgroundBlurToggle() {
+  const [on, setOn] = useState(false);
+  return <ToggleSwitch value={on} onChange={setOn} />;
+}
+
+function HdToggle() {
+  const [on, setOn] = useState(true);
+  return <ToggleSwitch value={on} onChange={setOn} />;
+}
+
+function MirrorToggle({
+  mirrored,
+  onChange,
+}: {
+  mirrored: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return <ToggleSwitch value={mirrored} onChange={onChange} />;
+}
+
 interface LobbyState {
   mentorName: string;
   mentorRole: string;
@@ -51,6 +98,8 @@ export default function MeetingLobbyPage() {
 
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
+  const [mirrored, setMirrored] = useState(true);
+  const [camError, setCamError] = useState(false);
   const [joining, setJoining] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -58,17 +107,30 @@ export default function MeetingLobbyPage() {
 
   useEffect(() => {
     if (camOn) {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      setCamError(false);
+      navigator.mediaDevices
+        .getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false })
         .then((stream) => {
           streamRef.current = stream;
-          if (videoRef.current) videoRef.current.srcObject = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
         })
-        .catch(() => {});
+        .catch(() => {
+          setCamError(true);
+        });
     } else {
-      if (streamRef.current) { streamRef.current.getTracks().forEach((t) => t.stop()); streamRef.current = null; }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+      }
       if (videoRef.current) videoRef.current.srcObject = null;
     }
-    return () => { if (streamRef.current) streamRef.current.getTracks().forEach((t) => t.stop()); };
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+      }
+    };
   }, [camOn]);
 
   const handleJoin = () => { setJoining(true); setCountdown(3); };
@@ -98,9 +160,15 @@ export default function MeetingLobbyPage() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "var(--bg-base)" }}>
       <nav className="flex items-center justify-between px-8 py-4 border-b" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>
-        <div className="flex items-center gap-2.5">
-          <img src="https://public.readdy.ai/ai/img_res/c1296ba1-3a0e-4b18-b1f8-e3ff105a92d8.png" alt="GrowthFlow" className="w-8 h-8 object-contain" />
-          <span className="font-bold text-lg" style={{ color: "var(--text-primary)" }}>GrowthFlow</span>
+        <div className="flex items-center gap-3">
+          {/* Logo icon — purple rounded square with sparkle */}
+          <div
+            className="w-9 h-9 flex items-center justify-center rounded-xl flex-shrink-0"
+            style={{ backgroundColor: "#7C3AED" }}
+          >
+            <i className="ri-sparkling-2-fill text-white text-base" />
+          </div>
+          <span className="font-bold text-xl tracking-tight" style={{ color: "#7C3AED" }}>GrowthFlow</span>
         </div>
         <div className="flex items-center gap-2 text-sm" style={{ color: "var(--text-muted)" }}>
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -120,30 +188,61 @@ export default function MeetingLobbyPage() {
           {/* LEFT — Camera preview + controls */}
           <div className="lg:col-span-3 flex flex-col gap-5">
             <div className="relative bg-gray-900 rounded-2xl overflow-hidden aspect-video w-full">
-              {camOn ? (
-                <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover scale-x-[-1]" />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+              {/* Live self-view — always rendered so the ref is attached; hidden when cam is off or errored */}
+              <video
+                ref={videoRef}
+                autoPlay
+                muted
+                playsInline
+                className="w-full h-full object-cover transition-transform duration-200"
+                style={{
+                  transform: mirrored ? "scaleX(-1)" : "scaleX(1)",
+                  display: camOn && !camError ? "block" : "none",
+                }}
+              />
+
+              {/* Camera off state */}
+              {!camOn && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
                   <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gray-700">
-                    <i className="ri-user-line text-gray-400 text-3xl" />
+                    <i className="ri-video-off-line text-gray-400 text-3xl" />
                   </div>
                   <p className="text-gray-400 text-sm">Camera is off</p>
                 </div>
               )}
+
+              {/* Camera permission denied */}
+              {camOn && camError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
+                  <div className="w-16 h-16 flex items-center justify-center rounded-full bg-red-900/40">
+                    <i className="ri-camera-off-line text-red-400 text-3xl" />
+                  </div>
+                  <p className="text-gray-300 text-sm font-medium">Camera access denied</p>
+                  <p className="text-gray-500 text-xs leading-relaxed">
+                    Allow camera access in your browser settings, then toggle the camera button below.
+                  </p>
+                </div>
+              )}
+
+              {/* Name label */}
               <div className="absolute bottom-4 left-4 px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-sm">
                 <p className="text-white text-xs font-medium">You (Mentee)</p>
               </div>
+
+              {/* Mic status indicator */}
               <div className="absolute top-4 right-4">
-                {micOn ? (
-                  <div className="w-8 h-8 flex items-center justify-center rounded-full bg-emerald-500/90 backdrop-blur-sm">
-                    <i className="ri-mic-line text-white text-sm" />
-                  </div>
-                ) : (
-                  <div className="w-8 h-8 flex items-center justify-center rounded-full bg-red-500/90 backdrop-blur-sm">
-                    <i className="ri-mic-off-line text-white text-sm" />
-                  </div>
-                )}
+                <div className={`w-8 h-8 flex items-center justify-center rounded-full backdrop-blur-sm ${micOn ? "bg-emerald-500/90" : "bg-red-500/90"}`}>
+                  <i className={`${micOn ? "ri-mic-line" : "ri-mic-off-line"} text-white text-sm`} />
+                </div>
               </div>
+
+              {/* Mirror indicator badge — only when cam is on */}
+              {camOn && !camError && (
+                <div className="absolute top-4 left-4 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-sm flex items-center gap-1.5">
+                  <i className="ri-flip-horizontal-line text-gray-300 text-xs" />
+                  <span className="text-gray-300 text-xs">{mirrored ? "Mirrored" : "Normal"}</span>
+                </div>
+              )}
             </div>
 
             <div className="rounded-2xl border p-5" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>
@@ -182,6 +281,50 @@ export default function MeetingLobbyPage() {
                   Test Audio
                 </button>
               </div>
+
+              {/* Camera settings — only visible when camera is on */}
+              {camOn && (
+                <div
+                  className="mt-4 pt-4 border-t"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--text-muted)" }}>
+                    Camera Settings
+                  </p>
+                  <div className="flex flex-col gap-3">
+                    {/* Background blur */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 flex items-center justify-center rounded-lg" style={{ backgroundColor: "var(--accent-light)" }}>
+                          <i className="ri-blur-off-line text-xs" style={{ color: "var(--accent-text)" }} />
+                        </div>
+                        <span className="text-sm" style={{ color: "var(--text-secondary)" }}>Background Blur</span>
+                      </div>
+                      <BackgroundBlurToggle />
+                    </div>
+                    {/* Mirror video */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 flex items-center justify-center rounded-lg" style={{ backgroundColor: "var(--accent-light)" }}>
+                          <i className="ri-flip-horizontal-line text-xs" style={{ color: "var(--accent-text)" }} />
+                        </div>
+                        <span className="text-sm" style={{ color: "var(--text-secondary)" }}>Mirror Video</span>
+                      </div>
+                      <MirrorToggle mirrored={mirrored} onChange={setMirrored} />
+                    </div>
+                    {/* HD quality */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 flex items-center justify-center rounded-lg" style={{ backgroundColor: "var(--accent-light)" }}>
+                          <i className="ri-hd-line text-xs" style={{ color: "var(--accent-text)" }} />
+                        </div>
+                        <span className="text-sm" style={{ color: "var(--text-secondary)" }}>HD Quality</span>
+                      </div>
+                      <HdToggle />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="rounded-2xl border p-5" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>
