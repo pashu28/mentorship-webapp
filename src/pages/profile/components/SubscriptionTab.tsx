@@ -1,16 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BADGE_DEFS, CREDITS_PER_TASK, achievementStats } from "@/mocks/achievements";
-
-function loadTotalCompleted(): number {
-  try { const raw = localStorage.getItem("task_total_completed"); if (raw) return parseInt(raw, 10) || 0; } catch (_) { /* ignore */ }
-  return achievementStats.totalTasksCompleted;
-}
-function calcCredits(n: number): number {
-  return n * CREDITS_PER_TASK + BADGE_DEFS.filter((b) => n >= b.tasksRequired).reduce((s, b) => s + b.bonusCredits, 0);
-}
-function getEarnedBadges(n: number) { return BADGE_DEFS.filter((b) => n >= b.tasksRequired); }
-function getNextBadge(n: number) { return BADGE_DEFS.find((b) => n < b.tasksRequired) ?? null; }
+import { useAchievements } from "@/hooks/useAchievements";
+import { BADGE_DEFS } from "@/mocks/achievements";
 
 const REDEMPTIONS = [
   { id: "bonus-session",    title: "Free Bonus Session",       description: "1 extra 30-min mentor session, on us",              cost: 200, icon: "ri-video-chat-line",    tag: "Most Popular" },
@@ -27,22 +18,18 @@ const PLANS = [
 
 export default function SubscriptionTab() {
   const navigate = useNavigate();
+  const stats = useAchievements();
+  const { totalTasksCompleted, totalCreditsEarned: totalCredits, earnedBadgeDefs, nextBadgeDef: nextBadge, balance: availableCredits, latestBadgeDef: latestBadge } = stats;
+
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
   const [redeemedIds, setRedeemedIds] = useState<string[]>([]);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<string>("pro");
 
-  const totalCompleted = loadTotalCompleted();
-  const totalCredits = calcCredits(totalCompleted);
-  const earnedBadges = getEarnedBadges(totalCompleted);
-  const nextBadge = getNextBadge(totalCompleted);
-  const spentCredits = redeemedIds.reduce((sum, id) => sum + (REDEMPTIONS.find((x) => x.id === id)?.cost ?? 0), 0);
-  const availableCredits = totalCredits - spentCredits;
-  const latestBadge = earnedBadges[earnedBadges.length - 1] ?? null;
   const nextBadgeThreshold = nextBadge?.tasksRequired ?? (latestBadge?.tasksRequired ?? 1);
   const prevBadgeThreshold = latestBadge?.tasksRequired ?? 0;
   const badgeProgressPct = nextBadge
-    ? Math.min(Math.round(((totalCompleted - prevBadgeThreshold) / (nextBadgeThreshold - prevBadgeThreshold)) * 100), 100)
+    ? Math.min(Math.round(((totalTasksCompleted - prevBadgeThreshold) / (nextBadgeThreshold - prevBadgeThreshold)) * 100), 100)
     : 100;
 
   function handleRedeem(id: string) {
@@ -104,7 +91,7 @@ export default function SubscriptionTab() {
                 Next: <span className="font-semibold" style={{ color: "var(--text-secondary)" }}>{nextBadge.name}</span>
                 <span className="font-semibold ml-1" style={{ color: "var(--success)" }}>+{nextBadge.bonusCredits} cr</span>
               </p>
-              <p className="text-[10px] font-bold" style={{ color: "var(--text-muted)" }}>{nextBadge.tasksRequired - totalCompleted} tasks away</p>
+              <p className="text-[10px] font-bold" style={{ color: "var(--text-muted)" }}>{nextBadge.tasksRequired - totalTasksCompleted} tasks away</p>
             </div>
             <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "var(--bg-elevated)" }}>
               <div className="h-full rounded-full transition-all duration-700" style={{ width: `${badgeProgressPct}%`, backgroundColor: "var(--accent)" }} />
@@ -113,7 +100,7 @@ export default function SubscriptionTab() {
         ) : (
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold" style={{ color: "var(--success)" }}>All badges earned!</p>
-            <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>{earnedBadges.length} of {BADGE_DEFS.length} milestones complete</p>
+            <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>{earnedBadgeDefs.length} of {BADGE_DEFS.length} milestones complete</p>
           </div>
         )}
         <button type="button" onClick={() => navigate("/achievements")}

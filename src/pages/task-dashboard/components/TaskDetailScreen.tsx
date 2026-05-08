@@ -61,7 +61,9 @@ export default function TaskDetailScreen({ task, onSubTaskToggle, onTaskComplete
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [answeredCorrect, setAnsweredCorrect] = useState<boolean | null>(null);
   const [tutorInput, setTutorInput] = useState("");
-  const [tutorMessages, setTutorMessages] = useState<{ role: "user" | "ai"; text: string }[]>([]);
+  const [tutorMessages, setTutorMessages] = useState<{ role: "user" | "ai"; text: string }[]>([
+    { role: "ai", text: `Hi! I'm your AI Tutor for "${task.title}". Ask me anything about this task — concepts, steps, or anything you're unsure about.` }
+  ]);
   const [tutorTyping, setTutorTyping] = useState(false);
   const [quizUnlocked, setQuizUnlocked] = useState(false);
   const [completeUnlocked, setCompleteUnlocked] = useState(false);
@@ -280,38 +282,8 @@ export default function TaskDetailScreen({ task, onSubTaskToggle, onTaskComplete
               </div>
 
               <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4">
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: "var(--accent-light)" }}>
-                    <i className="ri-sparkling-2-fill text-sm" style={{ color: "var(--accent)" }} />
-                  </div>
-                  <div className="max-w-[80%] p-4 rounded-2xl rounded-tl-sm text-sm leading-relaxed border" style={{ backgroundColor: "var(--bg-elevated)", borderColor: "var(--border)", color: "var(--text-primary)" }}>
-                    Hi! I&apos;m your AI Tutor for <strong>&ldquo;{task.title}&rdquo;</strong>. Ask me anything about this task — concepts, steps, or anything you&apos;re unsure about.
-                  </div>
-                </div>
-
-                {tutorMessages.length <= 1 && !tutorTyping && (
-                  <div className="flex flex-col gap-2 pl-11">
-                    <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>Try asking:</p>
-                    {[
-                      "How do I get started with this task?",
-                      "What's the most important thing to understand here?",
-                      "Can you explain the key concepts?",
-                    ].map((q) => (
-                      <button
-                        key={q}
-                        type="button"
-                        onClick={() => setTutorInput(q)}
-                        className="text-left text-xs px-3 py-2 rounded-xl border transition-all cursor-pointer"
-                        style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-elevated)", color: "var(--text-secondary)" }}
-                      >
-                        {q}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {tutorMessages.slice(1).map((msg, i) => (
-                  <div key={i + 1} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
+                {tutorMessages.map((msg, i) => (
+                  <div key={i} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
                     <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: msg.role === "ai" ? "var(--accent-light)" : "var(--bg-elevated)" }}>
                       <i className={`${msg.role === "ai" ? "ri-sparkling-2-fill" : "ri-user-line"} text-sm`} style={{ color: msg.role === "ai" ? "var(--accent)" : "var(--text-muted)" }} />
                     </div>
@@ -336,6 +308,27 @@ export default function TaskDetailScreen({ task, onSubTaskToggle, onTaskComplete
                       <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: "var(--text-muted)", animationDelay: "150ms" }} />
                       <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: "var(--text-muted)", animationDelay: "300ms" }} />
                     </div>
+                  </div>
+                )}
+
+                {tutorMessages.length === 1 && !tutorTyping && (
+                  <div className="flex flex-col gap-2 pl-11">
+                    <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>Try asking:</p>
+                    {[
+                      "How do I get started with this task?",
+                      "What's the most important thing to understand here?",
+                      "Can you explain the key concepts?",
+                    ].map((q) => (
+                      <button
+                        key={q}
+                        type="button"
+                        onClick={() => setTutorInput(q)}
+                        className="text-left text-xs px-3 py-2 rounded-xl border transition-all cursor-pointer"
+                        style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-elevated)", color: "var(--text-secondary)" }}
+                      >
+                        {q}
+                      </button>
+                    ))}
                   </div>
                 )}
                 <div ref={chatEndRef} />

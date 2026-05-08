@@ -85,7 +85,7 @@ export default function BookingModal({ mentor, onClose, onConfirm }: BookingModa
                       className="aspect-square rounded-lg text-sm font-medium transition-all cursor-pointer"
                       style={
                         !day.available
-                          ? { color: "var(--text-disabled)", cursor: "not-allowed" }
+                          ? { backgroundColor: "var(--bg-elevated)", color: "var(--text-muted)", cursor: "not-allowed" }
                           : selectedDate === day.date
                           ? { backgroundColor: "var(--accent)", color: "#fff" }
                           : { color: "var(--text-primary)" }

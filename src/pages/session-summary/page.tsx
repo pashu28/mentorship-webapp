@@ -1,19 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { resourceVault, roadmapSteps } from "@/mocks/session";
 import SessionFeedbackModal, { FeedbackData } from "./SessionFeedbackModal";
 
-function getBookedMentor() {
+interface BookedMentor {
+  mentorName: string;
+  mentorPhoto: string;
+  sessionDate: string;
+}
+
+function getBookedMentor(): BookedMentor {
   try {
     const raw = localStorage.getItem("mentorAI_bookedMentor");
     if (raw) {
-      const m = JSON.parse(raw) as { name?: string; mentorName?: string; photo?: string; mentorPhoto?: string };
+      const m = JSON.parse(raw) as {
+        name?: string; mentorName?: string;
+        photo?: string; mentorPhoto?: string;
+        date?: string; sessionDate?: string;
+      };
       const resolvedName = m.name ?? m.mentorName ?? "";
       const resolvedPhoto = m.photo ?? m.mentorPhoto ?? "";
+      const resolvedDate = m.date ?? m.sessionDate ?? "Apr 7, 2026";
       if (resolvedName) {
         return {
           mentorName: resolvedName,
           mentorPhoto: resolvedPhoto || "https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20smiling%20mentor%2C%20soft%20studio%20lighting%2C%20clean%20white%20background%2C%20business%20casual%20attire%2C%20high%20quality%20portrait%20photography&width=400&height=400&seq=mentor-default&orientation=squarish",
+          sessionDate: resolvedDate,
         };
       }
     }
@@ -21,11 +33,23 @@ function getBookedMentor() {
   return {
     mentorName: "Your Mentor",
     mentorPhoto: "https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20smiling%20mentor%2C%20soft%20studio%20lighting%2C%20clean%20white%20background%2C%20business%20casual%20attire%2C%20high%20quality%20portrait%20photography&width=400&height=400&seq=mentor-default&orientation=squarish",
+    sessionDate: "Apr 7, 2026",
   };
 }
 
 export default function SessionSummaryPage() {
-  const bookedMentor = getBookedMentor();
+  const [bookedMentor, setBookedMentor] = useState<BookedMentor>(getBookedMentor);
+
+  useEffect(() => {
+    setBookedMentor(getBookedMentor());
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "mentorAI_bookedMentor") {
+        setBookedMentor(getBookedMentor());
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
   const [tasks, setTasks] = useState(
     roadmapSteps.map((step) => ({ ...step, tasks: step.tasks.map((t) => ({ ...t, checked: false })) }))
   );
@@ -47,7 +71,7 @@ export default function SessionSummaryPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "var(--bg-base)" }}>
+    <div className="h-screen overflow-hidden flex flex-col" style={{ backgroundColor: "var(--bg-base)" }}>
       {showFeedback && (
         <SessionFeedbackModal
           mentorName={bookedMentor.mentorName}
@@ -59,22 +83,20 @@ export default function SessionSummaryPage() {
         />
       )}
 
-      <nav className="flex items-center justify-between px-8 py-4 border-b" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>
+      <nav className="flex-shrink-0 flex items-center justify-between px-8 py-4 border-b" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>
         <div className="flex items-center gap-2.5">
-          <img src="https://public.readdy.ai/ai/img_res/c1296ba1-3a0e-4b18-b1f8-e3ff105a92d8.png" alt="GrowthFlow" className="w-8 h-8 object-contain" />
-          <span className="font-bold text-lg" style={{ color: "var(--text-primary)" }}>GrowthFlow</span>
+          <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-violet-500">
+            <i className="ri-sparkling-2-fill text-white text-lg" />
+          </div>
+          <span className="font-bold text-lg text-violet-600">GrowthFlow</span>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-            Session with {bookedMentor.mentorName} · Apr 7, 2026 · 60 min
-          </span>
-          <button type="button" onClick={() => navigate("/dashboard")} className="px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer whitespace-nowrap" style={{ backgroundColor: "var(--bg-elevated)", color: "var(--text-secondary)" }}>
-            Go to Dashboard
-          </button>
-        </div>
+        <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+          Session with {bookedMentor.mentorName} · {bookedMentor.sessionDate} · 60 min
+        </span>
       </nav>
 
-      <main className="flex-1 w-full max-w-3xl mx-auto px-6 py-10 pb-32">
+      <main className="flex-1 overflow-y-auto w-full">
+        <div className="max-w-3xl mx-auto px-6 py-10 pb-32">
         <div className="text-center mb-10">
           <div className="text-4xl mb-3">🎉</div>
           <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>Session Complete!</h1>
@@ -155,6 +177,7 @@ export default function SessionSummaryPage() {
             ))}
           </div>
         </section>
+        </div>
       </main>
 
       <div className="fixed bottom-0 left-0 right-0 border-t px-8 py-4 flex items-center justify-between" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>

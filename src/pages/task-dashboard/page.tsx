@@ -90,18 +90,34 @@ const STEP_STYLE = {
 
 type TabId = "overview" | "tasks";
 
-const STORAGE_KEY = "task_total_completed";
+const TASKS_STORAGE_KEY = "task_dashboard_tasks";
+const COMPLETION_HISTORY_KEY = "task_completion_history";
 
-function loadTotalCompleted(): number {
+function loadTasks(): MainTask[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return parseInt(raw, 10) || 0;
+    const raw = localStorage.getItem(TASKS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as MainTask[];
+      if (parsed && parsed.length === initialTasks.length) return parsed;
+    }
   } catch (_) { /* ignore */ }
-  return 0;
+  return initialTasks.map((t) => ({ ...t, subTasks: t.subTasks.map((s) => ({ ...s })) }));
 }
 
-function saveTotalCompleted(n: number) {
-  localStorage.setItem(STORAGE_KEY, String(n));
+function saveTasks(tasks: MainTask[]) {
+  localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
+}
+
+function loadCompletionHistory(): { id: string; taskId: string; taskTitle: string; stepLabel: string; creditsEarned: number; completedAt: string }[] {
+  try {
+    const raw = localStorage.getItem(COMPLETION_HISTORY_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (_) { /* ignore */ }
+  return [];
+}
+
+function saveCompletionHistory(history: ReturnType<typeof loadCompletionHistory>) {
+  localStorage.setItem(COMPLETION_HISTORY_KEY, JSON.stringify(history));
 }
 
 interface LockTooltip {
@@ -129,26 +145,18 @@ export default function TaskDashboardPage() {
 
   useEffect(() => {
     setMentor(getBookedMentorInfo());
+    // Clean up legacy localStorage key from older app versions
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const stored = parseInt(raw, 10) || 0;
-        if (stored > initialTasks.length) {
-          localStorage.removeItem(STORAGE_KEY);
-          setTotalCompleted(0);
-        }
-      }
+      localStorage.removeItem("task_total_completed");
     } catch (_) { /* ignore */ }
   }, []);
 
-  const [tasks, setTasks] = useState<MainTask[]>(
-    initialTasks.map((t) => ({ ...t, subTasks: t.subTasks.map((s) => ({ ...s })) }))
-  );
+  const [tasks, setTasks] = useState<MainTask[]>(loadTasks);
   const [selectedTask, setSelectedTask] = useState<MainTask | null>(null);
   const [showEffect, setShowEffect] = useState(false);
   const [showBadge, setShowBadge] = useState(false);
   const [newBadgeName, setNewBadgeName] = useState(0);
-  const [totalCompleted, setTotalCompleted] = useState<number>(loadTotalCompleted);
+  const totalCompleted = tasks.filter((t) => t.done).length;
 
   const totalCredits = calcCredits(totalCompleted);
   const earnedBadges = getEarnedBadges(totalCompleted);
@@ -200,28 +208,53 @@ export default function TaskDashboardPage() {
   }, [lockTooltip]);
 
   const handleTaskComplete = useCallback((taskId: string) => {
-    setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, done: true } : t)));
-    setShowEffect(true);
-    setTotalCompleted((prev) => {
-      const next = prev + 1;
-      saveTotalCompleted(next);
-      const newBadge = BADGE_DEFS.find((b) => b.tasksRequired === next);
-      if (newBadge) {
-        setNewBadgeName(next);
-        setShowBadge(true);
-      }
+    setTasks((prev) => {
+      const next = prev.map((t) => (t.id === taskId ? { ...t, done: true } : t));
+      saveTasks(next);
       return next;
     });
-  }, []);
+    // Record completion history with real task data
+    const task = tasks.find((t) => t.id === taskId);
+    if (task) {
+      const history = loadCompletionHistory();
+      const entry = {
+        id: `ct-${taskId}-${Date.now()}`,
+        taskId: task.id,
+        taskTitle: task.title,
+        stepLabel: task.stepLabel,
+        creditsEarned: CREDITS_PER_TASK,
+        completedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      };
+      history.push(entry);
+      saveCompletionHistory(history);
+      // Dispatch event so achievements page updates in real-time
+      window.dispatchEvent(new CustomEvent("taskCompleted"));
+    }
+  }, [tasks]);
+
+  const prevTotalCompletedRef = useRef(totalCompleted);
+  useEffect(() => {
+    if (totalCompleted > prevTotalCompletedRef.current) {
+      setShowEffect(true);
+      const newBadge = BADGE_DEFS.find((b) => b.tasksRequired === totalCompleted);
+      if (newBadge) {
+        setNewBadgeName(totalCompleted);
+        setShowBadge(true);
+      }
+    }
+    prevTotalCompletedRef.current = totalCompleted;
+  }, [totalCompleted]);
 
   const handleSubTaskToggle = (taskId: string, subId: string) => {
-    setTasks((prev) =>
-      prev.map((t) =>
+    setTasks((prev) => {
+      const next = prev.map((t) =>
         t.id === taskId
           ? { ...t, subTasks: t.subTasks.map((s) => (s.id === subId ? { ...s, done: !s.done } : s)) }
           : t
-      )
-    );
+      );
+      saveTasks(next);
+      return next;
+    });
   };
 
   const getUpdatedTask = (taskId: string) => tasks.find((t) => t.id === taskId) ?? null;

@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const NAV_ITEMS = [
-  { label: "My Assigned Tasks", icon: "ri-task-line",              activeIcon: "ri-task-fill",              path: "/task-dashboard" },
   { label: "My Sessions",       icon: "ri-calendar-schedule-line", activeIcon: "ri-calendar-schedule-fill", path: "/session-dashboard" },
+  { label: "My Assigned Tasks", icon: "ri-task-line",              activeIcon: "ri-task-fill",              path: "/task-dashboard" },
   { label: "Achievements",      icon: "ri-trophy-line",            activeIcon: "ri-trophy-fill",            path: "/achievements" },
   { label: "In-App Tutor",      icon: "ri-sparkling-2-line",      activeIcon: "ri-sparkling-2-fill",      path: "/tutor" },
   { label: "Resource Vault",    icon: "ri-archive-drawer-line",   activeIcon: "ri-archive-drawer-fill",   path: "/resources" },
@@ -152,10 +152,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {/* Logo */}
         <button
           type="button"
-          onClick={() => navigate("/task-dashboard")}
+          onClick={() => navigate("/intake")}
           className={`flex items-center gap-2.5 px-4 py-5 border-b w-full cursor-pointer transition-opacity hover:opacity-80 ${collapsed ? "justify-center" : ""}`}
           style={{ borderColor: "var(--border)" }}
-          title="Go to Dashboard"
+          title="Go to Intake"
         >
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
